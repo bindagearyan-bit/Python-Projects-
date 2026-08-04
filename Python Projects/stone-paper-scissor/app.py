@@ -3,33 +3,31 @@ import random
 def check(comp, user):
     if comp == user:
         return 0
-    elif comp == 0 and user == 1:  # rock vs paper -> user wins
+    elif comp == "rock" and user == "paper":
         return -1
-    elif comp == 1 and user == 2:  # paper vs scissors -> user wins
+    elif comp == "paper" and user == "scissor":
         return -1
-    elif comp == 2 and user == 0:  # scissors vs rock -> user wins
+    elif comp == "scissor" and user == "rock":
         return -1
     else:
         return 1
 
 def get_user_choice():
+    valid_choices = ["rock", "paper", "scissor"]
     while True:
-        try:
-            user = int(input("0 for rock, 1 for paper, 2 for scissor: "))
-            if user in (0, 1, 2):
-                return user
-            else:
-                print("Invalid input! Please enter 0, 1, or 2.")
-        except ValueError:
-            print("Invalid input! Please enter a number (0, 1, or 2).")
+        user = input("Type rock, paper, or scissor: ").strip().lower()
+        if user in valid_choices:
+            return user
+        else:
+            print("Invalid input! Please type rock, paper, or scissor.")
 
-comp = random.randint(0, 2)
+choices = ["rock", "paper", "scissor"]
+comp = random.choice(choices)
 user = get_user_choice()
 score = check(comp, user)
 
-choices = {0: "Rock", 1: "Paper", 2: "Scissor"}
-print("You :", choices[user])
-print("Computer :", choices[comp])
+print("You :", user.capitalize())
+print("Computer :", comp.capitalize())
 
 if score == 0:
     print("It's a draw!")
