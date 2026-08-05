@@ -1,22 +1,22 @@
-🪨📄✂️ Rock Paper Scissors Game
+# 🪨📄✂️ Rock Paper Scissors Game
 
 A simple command-line Rock Paper Scissors game built in Python, where you play against the computer.
 
-📌 About
+## 📌 About
 
 This is a beginner-friendly Python project that simulates the classic Rock Paper Scissors game. The computer randomly picks a choice, you enter yours, and the game determines the winner.
 
-🚀 Features
+## 🚀 Features
 
 - Play Rock, Paper, or Scissors against the computer
 - Input validation — handles invalid or non-numeric input gracefully
 - Clear, readable output showing both choices and the result
 
-🛠️ Tech Stack
+## 🛠️ Tech Stack
 
 - Python 3
 
-▶️ How to Run
+## ▶️ How to Run
 
 1. Clone this repository
    ```bash
@@ -32,7 +32,7 @@ This is a beginner-friendly Python project that simulates the classic Rock Paper
    0 for rock, 1 for paper, 2 for scissor:
    ```
 
-🎮 Example
+## 🎮 Example
 
 ```
 0 for rock, 1 for paper, 2 for scissor: 1
@@ -41,7 +41,7 @@ Computer : Rock
 You Win!
 ```
 
-🗺️ Roadmap / Upcoming Features
+## 🗺️ Roadmap / Upcoming Features
 
 - [ ] Play again option with round tracking
 - [ ] Score tracker (wins/losses/draws)
@@ -51,7 +51,7 @@ You Win!
 - [ ] GUI version using Tkinter
 - [ ] Web version using Flask
 
-🤝 Contributing
+## 🤝 Contributing
 
 This is a personal learning project, but suggestions and feedback are always welcome!
 
