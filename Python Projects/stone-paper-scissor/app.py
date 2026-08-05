@@ -15,7 +15,6 @@ def check(comp, user):
 def get_user_choice(input_mode):
     valid_words = ["rock", "paper", "scissor"]
     num_to_word = {"0": "rock", "1": "paper", "2": "scissor"}
-
     while True:
         if input_mode == "word":
             user = input("Type rock, paper, or scissor: ").strip().lower()
@@ -35,56 +34,51 @@ def play_game(input_mode):
     comp = random.choice(choices)
     user = get_user_choice(input_mode)
     score = check(comp, user)
-
     print("You :", user.capitalize())
     print("Computer :", comp.capitalize())
-
     if score == 0:
         print("It's a draw!")
     elif score == 1:
         print("You Win!")
     else:
         print("You Lose!")
-
     return score
 
-# Choose input mode
-print("Choose input mode:")
-print("1. Words (rock, paper, scissor)")
-print("2. Numbers (0, 1, 2)")
-mode_choice = input("Enter 1 or 2: ").strip()
-input_mode = "word" if mode_choice == "1" else "number"
+if __name__ == "__main__":
+    print("Choose input mode:")
+    print("1. Words (rock, paper, scissor)")
+    print("2. Numbers (0, 1, 2)")
+    mode_choice = input("Enter 1 or 2: ").strip()
+    input_mode = "word" if mode_choice == "1" else "number"
 
-# Choose game mode
-print("\nChoose mode:")
-print("1. Best of 3")
-print("2. Best of 5")
-mode = input("Enter 1 or 2: ").strip()
-total_rounds = 3 if mode == "1" else 5
+    print("\nChoose mode:")
+    print("1. Best of 3")
+    print("2. Best of 5")
+    mode = input("Enter 1 or 2: ").strip()
+    total_rounds = 3 if mode == "1" else 5
 
-wins = 0
-losses = 0
-draws = 0
+    wins = 0
+    losses = 0
+    draws = 0
 
-for round_num in range(1, total_rounds + 1):
-    print(f"\n--- Round {round_num} ---")
-    result = play_game(input_mode)
+    for round_num in range(1, total_rounds + 1):
+        print(f"\n--- Round {round_num} ---")
+        result = play_game(input_mode)
+        if result == 1:
+            wins += 1
+        elif result == -1:
+            losses += 1
+        else:
+            draws += 1
 
-    if result == 1:
-        wins += 1
-    elif result == -1:
-        losses += 1
+    print("\n--- Final Score ---")
+    print(f"Wins   : {wins}")
+    print(f"Losses : {losses}")
+    print(f"Draws  : {draws}")
+
+    if wins > losses:
+        print("You won the match! 🎉")
+    elif losses > wins:
+        print("You lost the match!")
     else:
-        draws += 1
-
-print("\n--- Final Score ---")
-print(f"Wins   : {wins}")
-print(f"Losses : {losses}")
-print(f"Draws  : {draws}")
-
-if wins > losses:
-    print("You won the match! 🎉")
-elif losses > wins:
-    print("You lost the match!")
-else:
-    print("The match is a draw!")
+        print("The match is a draw!")
