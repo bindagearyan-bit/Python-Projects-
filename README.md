@@ -1,55 +1,91 @@
 # 🪨📄✂️ Rock Paper Scissors Game
 
-A simple command-line Rock Paper Scissors game built in Python, where you play against the computer.
+A Rock Paper Scissors game built in Python — playable in the terminal or as a web app using Flask.
 
 ## 📌 About
 
-This is a beginner-friendly Python project that simulates the classic Rock Paper Scissors game. The computer randomly picks a choice, you enter yours, and the game determines the winner.
+This project started as a simple command-line Rock Paper Scissors game and has grown into a more complete app with input validation, multiple game modes, score tracking, and a web-based UI.
 
 ## 🚀 Features
 
 - Play Rock, Paper, or Scissors against the computer
-- Input validation — handles invalid or non-numeric input gracefully
-- Clear, readable output showing both choices and the result
+- Choose input mode: type words (`rock`, `paper`, `scissor`) or numbers (`0`, `1`, `2`)
+- Choose match mode: **Best of 3** or **Best of 5**
+- Live score tracking (wins / losses / draws) throughout the match
+- Final match result summary (win, lose, or draw the overall match)
+- Colored terminal output using `colorama` (green for win, red for loss, cyan for draw)
+- Web-based version using Flask, with clickable buttons instead of typing
 
 ## 🛠️ Tech Stack
 
 - Python 3
+- Flask (for the web version)
+- colorama (for colored terminal output)
+
+## 📁 Project Structure
+
+```
+rps-project/
+├── rps_terminal.py     # Core game logic + terminal version
+├── app.py              # Flask web app (reuses logic from rps_terminal.py)
+└── templates/
+    └── index.html      # Web UI
+```
 
 ## ▶️ How to Run
 
-1. Clone this repository
-   ```bash
-   git clone <your-repo-link>
-   cd <your-repo-folder>
-   ```
-2. Run the script
-   ```bash
-   python rps.py
-   ```
-3. Follow the on-screen prompt:
-   ```
-   0 for rock, 1 for paper, 2 for scissor:
-   ```
+### Terminal version
+```bash
+git clone <your-repo-link>
+cd <your-repo-folder>
+python rps_terminal.py
+```
+Follow the prompts to choose your input mode (words/numbers) and match mode (Best of 3/5).
 
-## 🎮 Example
+### Web version
+1. Install Flask
+   ```bash
+   pip install flask
+   ```
+2. Run the app
+   ```bash
+   python app.py
+   ```
+3. Open your browser at `http://127.0.0.1:5000`
+
+## 🎮 Example (Terminal)
 
 ```
-0 for rock, 1 for paper, 2 for scissor: 1
+Choose input mode:
+1. Words (rock, paper, scissor)
+2. Numbers (0, 1, 2)
+Enter 1 or 2: 1
+
+Choose mode:
+1. Best of 3
+2. Best of 5
+Enter 1 or 2: 1
+
+--- Round 1 ---
+Type rock, paper, or scissor: paper
 You : Paper
 Computer : Rock
 You Win!
+
+--- Final Score ---
+Wins   : 2
+Losses : 1
+Draws  : 0
+You won the match! 🎉
 ```
 
 ## 🗺️ Roadmap / Upcoming Features
 
-- [ ] Play again option with round tracking
-- [ ] Score tracker (wins/losses/draws)
-- [ ] Best of 3 / Best of 5 mode
-- [ ] Word input support ("rock", "paper", "scissor")
 - [ ] Rock Paper Scissors Lizard Spock variant
-- [ ] GUI version using Tkinter
-- [ ] Web version using Flask
+- [ ] "Computer is choosing..." animation delay
+- [ ] Unit tests using `pytest`
+- [ ] Deploy the web version live (Render / PythonAnywhere)
+- [ ] Player vs Player mode
 
 ## 🤝 Contributing
 
