@@ -1,4 +1,7 @@
 import random
+from colorama import init, Fore, Style
+
+init(autoreset=True)  # so colors reset automatically after each print
 
 def check(comp, user):
     if comp == user:
@@ -21,13 +24,13 @@ def get_user_choice(input_mode):
             if user in valid_words:
                 return user
             else:
-                print("Invalid input! Please type rock, paper, or scissor.")
+                print(Fore.YELLOW + "Invalid input! Please type rock, paper, or scissor.")
         else:
             user = input("Enter 0 for rock, 1 for paper, 2 for scissor: ").strip()
             if user in num_to_word:
                 return num_to_word[user]
             else:
-                print("Invalid input! Please enter 0, 1, or 2.")
+                print(Fore.YELLOW + "Invalid input! Please enter 0, 1, or 2.")
 
 def play_game(input_mode):
     choices = ["rock", "paper", "scissor"]
@@ -37,11 +40,11 @@ def play_game(input_mode):
     print("You :", user.capitalize())
     print("Computer :", comp.capitalize())
     if score == 0:
-        print("It's a draw!")
+        print(Fore.CYAN + "It's a draw!")
     elif score == 1:
-        print("You Win!")
+        print(Fore.GREEN + "You Win!")
     else:
-        print("You Lose!")
+        print(Fore.RED + "You Lose!")
     return score
 
 if __name__ == "__main__":
@@ -71,14 +74,14 @@ if __name__ == "__main__":
         else:
             draws += 1
 
-    print("\n--- Final Score ---")
-    print(f"Wins   : {wins}")
-    print(f"Losses : {losses}")
-    print(f"Draws  : {draws}")
+    print(Style.BRIGHT + "\n--- Final Score ---")
+    print(Fore.GREEN + f"Wins   : {wins}")
+    print(Fore.RED + f"Losses : {losses}")
+    print(Fore.CYAN + f"Draws  : {draws}")
 
     if wins > losses:
-        print("You won the match! 🎉")
+        print(Fore.GREEN + "You won the match! 🎉")
     elif losses > wins:
-        print("You lost the match!")
+        print(Fore.RED + "You lost the match!")
     else:
-        print("The match is a draw!")
+        print(Fore.CYAN + "The match is a draw!")
