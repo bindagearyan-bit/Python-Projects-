@@ -96,4 +96,4 @@ This is a personal learning project, but suggestions and feedback are always wel
 This project is open source and available under the [MIT License](LICENSE).
 ## 👤 Author
 
-Made by [Aryan Bindage] — [your GitHub profile link]
+Made by [Aryan Bindage] =[https://github.com/bindagearyan-bit]
