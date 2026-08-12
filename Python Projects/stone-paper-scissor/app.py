@@ -1,13 +1,14 @@
 from flask import Flask, render_template, request, session
 import random
-from rps_terminal import check   # importing your existing logic, no duplication
+from rps_terminal import check
 
 app = Flask(__name__)
 app.secret_key = "rps_secret_key"
 
 @app.route("/", methods=["GET", "POST"])
 def home():
-    if "wins" not in session:
+    if "started" not in session:
+        session["started"] = False
         session["wins"] = 0
         session["losses"] = 0
         session["draws"] = 0
@@ -27,12 +28,13 @@ def home():
             session["losses"] = 0
             session["draws"] = 0
             session["round"] = 0
+            session["started"] = True   # <-- key fix
 
         elif "choice" in request.form:
             choices = ["rock", "paper", "scissor"]
             user_choice = request.form["choice"]
             comp_choice = random.choice(choices)
-            score = check(comp_choice, user_choice)   # reused from rps_terminal.py
+            score = check(comp_choice, user_choice)
 
             if score == 0:
                 result = "It's a draw!"
@@ -60,7 +62,8 @@ def home():
         result=result, user_choice=user_choice, comp_choice=comp_choice,
         wins=session["wins"], losses=session["losses"], draws=session["draws"],
         round=session["round"], total_rounds=session["total_rounds"],
-        match_over=match_over, match_result=match_result
+        match_over=match_over, match_result=match_result,
+        started=session["started"]
     )
 
 @app.route("/reset")
