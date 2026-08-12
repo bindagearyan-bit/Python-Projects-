@@ -12,7 +12,7 @@
 <body>
     <h1>Rock Paper Scissor</h1>
 
-    {% if round == 0 %}
+    {% if not started %}
         <h3>Choose match mode:</h3>
         <form method="POST">
             <button name="mode" value="3">Best of 3</button>
