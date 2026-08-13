@@ -1,3 +1,5 @@
+print("THIS IS THE NEW VERSION - TEST 123")
+
 from flask import Flask, render_template, request, session
 import random
 from rps_terminal import check
