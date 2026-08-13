@@ -28,7 +28,7 @@ def home():
             session["losses"] = 0
             session["draws"] = 0
             session["round"] = 0
-            session["started"] = True   # <-- key fix
+            session["started"] = True
 
         elif "choice" in request.form:
             choices = ["rock", "paper", "scissor"]
@@ -59,10 +59,16 @@ def home():
 
     return render_template(
         "index.html",
-        result=result, user_choice=user_choice, comp_choice=comp_choice,
-        wins=session["wins"], losses=session["losses"], draws=session["draws"],
-        round=session["round"], total_rounds=session["total_rounds"],
-        match_over=match_over, match_result=match_result,
+        result=result,
+        user_choice=user_choice,
+        comp_choice=comp_choice,
+        wins=session["wins"],
+        losses=session["losses"],
+        draws=session["draws"],
+        round=session["round"],
+        total_rounds=session["total_rounds"],
+        match_over=match_over,
+        match_result=match_result,
         started=session["started"]
     )
 
