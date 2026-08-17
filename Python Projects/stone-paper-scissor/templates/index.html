@@ -3,41 +3,146 @@
 <head>
     <title>Rock Paper Scissors</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-        button { font-size: 18px; padding: 10px 20px; margin: 10px; cursor: pointer; }
-        .result { font-size: 24px; margin-top: 20px; font-weight: bold; }
-        .score { margin-top: 20px; font-size: 18px; }
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            text-align: center;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            max-width: 420px;
+            width: 90%;
+        }
+
+        h1 {
+            color: #2c2c54;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        h3 {
+            color: #555;
+            font-weight: 500;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+
+        button {
+            font-size: 16px;
+            padding: 12px 22px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            background: #2575fc;
+            color: white;
+            font-weight: 600;
+            transition: transform 0.15s ease, background 0.2s ease;
+        }
+
+        button:hover {
+            background: #1a5edb;
+            transform: translateY(-2px);
+        }
+
+        .choice-btn {
+            font-size: 24px;
+            padding: 16px 20px;
+            background: #f4f4f8;
+            color: #2c2c54;
+        }
+
+        .choice-btn:hover {
+            background: #e4e4f0;
+        }
+
+        .result {
+            font-size: 22px;
+            margin-top: 20px;
+            font-weight: 700;
+            color: #2c2c54;
+        }
+
+        .choices-made {
+            font-size: 15px;
+            color: #666;
+            margin: 4px 0;
+        }
+
+        .score {
+            margin-top: 20px;
+            font-size: 15px;
+            color: #444;
+            background: #f4f4f8;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .round-info {
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .play-again {
+            background: #28a745;
+        }
+
+        .play-again:hover {
+            background: #218838;
+        }
     </style>
 </head>
 <body>
-    <h1>Rock Paper Scissor</h1>
+    <div class="container">
+        <h1>🪨📄✂️ Rock Paper Scissor</h1>
 
-    {% if not started %}
-        <h3>Choose match mode:</h3>
-        <form method="POST">
-            <button name="mode" value="3">Best of 3</button>
-            <button name="mode" value="5">Best of 5</button>
-        </form>
-    {% elif not match_over %}
-        <p>Round {{ round + 1 }} of {{ total_rounds }}</p>
-        <form method="POST">
-            <button name="choice" value="rock">Rock</button>
-            <button name="choice" value="paper">Paper</button>
-            <button name="choice" value="scissor">Scissor</button>
-        </form>
+        {% if not started %}
+            <h3>Choose match mode</h3>
+            <div class="btn-group">
+                <form method="POST"><button name="mode" value="3">Best of 3</button></form>
+                <form method="POST"><button name="mode" value="5">Best of 5</button></form>
+            </div>
+        {% elif not match_over %}
+            <p class="round-info">Round {{ round + 1 }} of {{ total_rounds }}</p>
 
-        {% if result %}
-            <p>You chose: <b>{{ user_choice }}</b></p>
-            <p>Computer chose: <b>{{ comp_choice }}</b></p>
-            <p class="result">{{ result }}</p>
+            <form method="POST">
+                <div class="btn-group">
+                    <button class="choice-btn" name="choice" value="rock">🪨</button>
+                    <button class="choice-btn" name="choice" value="paper">📄</button>
+                    <button class="choice-btn" name="choice" value="scissor">✂️</button>
+                </div>
+            </form>
+
+            {% if result %}
+                <p class="choices-made">You: <b>{{ user_choice|capitalize }}</b> &nbsp;|&nbsp; Computer: <b>{{ comp_choice|capitalize }}</b></p>
+                <p class="result">{{ result }}</p>
+            {% endif %}
+
+            <p class="score">Wins: {{ wins }} &nbsp;|&nbsp; Losses: {{ losses }} &nbsp;|&nbsp; Draws: {{ draws }}</p>
+        {% else %}
+            <p class="result">{{ match_result }}</p>
+            <p class="score">Final Score — Wins: {{ wins }} | Losses: {{ losses }} | Draws: {{ draws }}</p>
+            <a href="/reset"><button class="play-again">Play Again</button></a>
         {% endif %}
-
-        <p class="score">Wins: {{ wins }} | Losses: {{ losses }} | Draws: {{ draws }}</p>
-    {% else %}
-        <p class="result">{{ match_result }}</p>
-        <p class="score">Final Score - Wins: {{ wins }} | Losses: {{ losses }} | Draws: {{ draws }}</p>
-        <a href="/reset"><button>Play Again</button></a>
-    {% endif %}
-
+    </div>
 </body>
 </html>
