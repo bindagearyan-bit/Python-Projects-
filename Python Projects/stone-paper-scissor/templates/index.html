@@ -3,9 +3,7 @@
 <head>
     <title>Rock Paper Scissors</title>
     <style>
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
 
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
@@ -25,6 +23,12 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             max-width: 420px;
             width: 90%;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         h1 {
@@ -33,10 +37,7 @@
             font-size: 28px;
         }
 
-        h3 {
-            color: #555;
-            font-weight: 500;
-        }
+        h3 { color: #555; font-weight: 500; }
 
         .btn-group {
             display: flex;
@@ -58,28 +59,58 @@
             transition: transform 0.15s ease, background 0.2s ease;
         }
 
-        button:hover {
-            background: #1a5edb;
-            transform: translateY(-2px);
-        }
+        button:hover { background: #1a5edb; transform: translateY(-2px); }
+        button:active { transform: scale(0.92); }
 
         .choice-btn {
-            font-size: 24px;
+            font-size: 28px;
             padding: 16px 20px;
             background: #f4f4f8;
             color: #2c2c54;
+            animation: popIn 0.4s ease backwards;
+        }
+
+        .choice-btn:nth-child(1) { animation-delay: 0.05s; }
+        .choice-btn:nth-child(2) { animation-delay: 0.15s; }
+        .choice-btn:nth-child(3) { animation-delay: 0.25s; }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.5); }
+            to { opacity: 1; transform: scale(1); }
         }
 
         .choice-btn:hover {
             background: #e4e4f0;
+            transform: translateY(-2px) rotate(-4deg);
+        }
+
+        .battle {
+            font-size: 40px;
+            margin: 15px 0;
+            animation: clash 0.6s ease;
+        }
+
+        @keyframes clash {
+            0% { transform: scale(0.5); opacity: 0; }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); opacity: 1; }
         }
 
         .result {
-            font-size: 22px;
-            margin-top: 20px;
+            font-size: 24px;
+            margin-top: 15px;
             font-weight: 700;
-            color: #2c2c54;
+            animation: resultPop 0.4s ease;
         }
+
+        @keyframes resultPop {
+            from { opacity: 0; transform: scale(0.7); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .result.win { color: #28a745; }
+        .result.lose { color: #dc3545; }
+        .result.draw { color: #ff9800; }
 
         .choices-made {
             font-size: 15px;
@@ -94,6 +125,7 @@
             background: #f4f4f8;
             padding: 10px;
             border-radius: 10px;
+            transition: background 0.3s ease;
         }
 
         .round-info {
@@ -104,10 +136,14 @@
 
         .play-again {
             background: #28a745;
+            animation: popIn 0.4s ease;
         }
 
-        .play-again:hover {
-            background: #218838;
+        .play-again:hover { background: #218838; }
+
+        .final-result {
+            font-size: 22px;
+            animation: fadeInUp 0.5s ease;
         }
     </style>
 </head>
@@ -133,13 +169,18 @@
             </form>
 
             {% if result %}
+                <div class="battle">
+                    {% if user_choice == "rock" %}🪨{% elif user_choice == "paper" %}📄{% else %}✂️{% endif %}
+                    ⚔️
+                    {% if comp_choice == "rock" %}🪨{% elif comp_choice == "paper" %}📄{% else %}✂️{% endif %}
+                </div>
                 <p class="choices-made">You: <b>{{ user_choice|capitalize }}</b> &nbsp;|&nbsp; Computer: <b>{{ comp_choice|capitalize }}</b></p>
-                <p class="result">{{ result }}</p>
+                <p class="result {% if 'Win' in result %}win{% elif 'Lose' in result %}lose{% else %}draw{% endif %}">{{ result }}</p>
             {% endif %}
 
             <p class="score">Wins: {{ wins }} &nbsp;|&nbsp; Losses: {{ losses }} &nbsp;|&nbsp; Draws: {{ draws }}</p>
         {% else %}
-            <p class="result">{{ match_result }}</p>
+            <p class="final-result result {% if 'won' in match_result %}win{% elif 'lost' in match_result %}lose{% else %}draw{% endif %}">{{ match_result }}</p>
             <p class="score">Final Score — Wins: {{ wins }} | Losses: {{ losses }} | Draws: {{ draws }}</p>
             <a href="/reset"><button class="play-again">Play Again</button></a>
         {% endif %}
