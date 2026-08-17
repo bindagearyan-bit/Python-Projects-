@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Rock Paper Scissors</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+        button { font-size: 18px; padding: 10px 20px; margin: 10px; cursor: pointer; }
+        .result { font-size: 24px; margin-top: 20px; font-weight: bold; }
+        .score { margin-top: 20px; font-size: 18px; }
+    </style>
+</head>
+<body>
+    <h1>Rock Paper Scissor</h1>
+
+    {% if not started %}
+        <h3>Choose match mode:</h3>
+        <form method="POST">
+            <button name="mode" value="3">Best of 3</button>
+            <button name="mode" value="5">Best of 5</button>
+        </form>
+    {% elif not match_over %}
+        <p>Round {{ round + 1 }} of {{ total_rounds }}</p>
+        <form method="POST">
+            <button name="choice" value="rock">Rock</button>
+            <button name="choice" value="paper">Paper</button>
+            <button name="choice" value="scissor">Scissor</button>
+        </form>
+
+        {% if result %}
+            <p>You chose: <b>{{ user_choice }}</b></p>
+            <p>Computer chose: <b>{{ comp_choice }}</b></p>
+            <p class="result">{{ result }}</p>
+        {% endif %}
+
+        <p class="score">Wins: {{ wins }} | Losses: {{ losses }} | Draws: {{ draws }}</p>
+    {% else %}
+        <p class="result">{{ match_result }}</p>
+        <p class="score">Final Score - Wins: {{ wins }} | Losses: {{ losses }} | Draws: {{ draws }}</p>
+        <a href="/reset"><button>Play Again</button></a>
+    {% endif %}
+
+</body>
+</html>
