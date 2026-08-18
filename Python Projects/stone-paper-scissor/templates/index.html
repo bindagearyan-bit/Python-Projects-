@@ -8,12 +8,89 @@
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
             text-align: center;
-            background: linear-gradient(135deg, #6a11cb, #2575fc);
             min-height: 100vh;
             margin: 0;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: background 0.3s ease;
+        }
+
+        body.light {
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+        }
+
+        body.dark {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+        }
+
+        .top-bar {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .top-bar form { margin: 0; }
+
+        .icon-btn {
+            background: rgba(255,255,255,0.25);
+            border: none;
+            border-radius: 10px;
+            padding: 8px 12px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .menu-bar {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+        }
+
+        .menu-btn {
+            background: rgba(255,255,255,0.25);
+            border: none;
+            border-radius: 10px;
+            padding: 8px 14px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        .dropdown {
+            display: none;
+            position: absolute;
+            top: 45px;
+            left: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            padding: 12px;
+            width: 200px;
+            text-align: left;
+        }
+
+        .dropdown.show { display: block; }
+
+        .dropdown p { margin: 6px 0; font-size: 14px; color: #333; font-weight: 600; }
+
+        .dropdown form { margin-bottom: 10px; }
+
+        .dropdown button {
+            width: 100%;
+            padding: 8px;
+            margin-top: 4px;
+            border: none;
+            border-radius: 8px;
+            background: #f4f4f8;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .dropdown button.active {
+            background: #2575fc;
+            color: white;
         }
 
         .container {
@@ -26,17 +103,20 @@
             animation: fadeInUp 0.5s ease;
         }
 
+        body.dark .container { background: #2c2c54; color: #eee; }
+        body.dark h1, body.dark h3, body.dark .round-info { color: #eee; }
+        body.dark .score { background: #3a3a6a; color: #eee; }
+        body.dark .choice-btn { background: #3a3a6a; }
+        body.dark .dropdown { background: #2c2c54; }
+        body.dark .dropdown p { color: #eee; }
+        body.dark .dropdown button { background: #3a3a6a; color: #eee; }
+
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        h1 {
-            color: #2c2c54;
-            margin-bottom: 10px;
-            font-size: 28px;
-        }
-
+        h1 { color: #2c2c54; margin-bottom: 10px; font-size: 26px; }
         h3 { color: #555; font-weight: 500; }
 
         .btn-group {
@@ -47,7 +127,7 @@
             margin: 20px 0;
         }
 
-        button {
+        button.primary {
             font-size: 16px;
             padding: 12px 22px;
             border: none;
@@ -59,14 +139,17 @@
             transition: transform 0.15s ease, background 0.2s ease;
         }
 
-        button:hover { background: #1a5edb; transform: translateY(-2px); }
-        button:active { transform: scale(0.92); }
+        button.primary:hover { background: #1a5edb; transform: translateY(-2px); }
+        button.primary:active { transform: scale(0.92); }
 
         .choice-btn {
             font-size: 28px;
             padding: 16px 20px;
             background: #f4f4f8;
+            border: none;
+            border-radius: 12px;
             color: #2c2c54;
+            cursor: pointer;
             animation: popIn 0.4s ease backwards;
         }
 
@@ -79,16 +162,9 @@
             to { opacity: 1; transform: scale(1); }
         }
 
-        .choice-btn:hover {
-            background: #e4e4f0;
-            transform: translateY(-2px) rotate(-4deg);
-        }
+        .choice-btn:hover { background: #e4e4f0; transform: translateY(-2px) rotate(-4deg); }
 
-        .battle {
-            font-size: 40px;
-            margin: 15px 0;
-            animation: clash 0.6s ease;
-        }
+        .battle { font-size: 40px; margin: 15px 0; animation: clash 0.6s ease; }
 
         @keyframes clash {
             0% { transform: scale(0.5); opacity: 0; }
@@ -96,12 +172,7 @@
             100% { transform: scale(1); opacity: 1; }
         }
 
-        .result {
-            font-size: 24px;
-            margin-top: 15px;
-            font-weight: 700;
-            animation: resultPop 0.4s ease;
-        }
+        .result { font-size: 24px; margin-top: 15px; font-weight: 700; animation: resultPop 0.4s ease; }
 
         @keyframes resultPop {
             from { opacity: 0; transform: scale(0.7); }
@@ -112,53 +183,67 @@
         .result.lose { color: #dc3545; }
         .result.draw { color: #ff9800; }
 
-        .choices-made {
-            font-size: 15px;
-            color: #666;
-            margin: 4px 0;
-        }
-
-        .score {
-            margin-top: 20px;
-            font-size: 15px;
-            color: #444;
-            background: #f4f4f8;
-            padding: 10px;
-            border-radius: 10px;
-            transition: background 0.3s ease;
-        }
-
-        .round-info {
-            color: #888;
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
-
-        .play-again {
-            background: #28a745;
-            animation: popIn 0.4s ease;
-        }
-
+        .choices-made { font-size: 15px; margin: 4px 0; }
+        .score { margin-top: 20px; font-size: 15px; background: #f4f4f8; padding: 10px; border-radius: 10px; }
+        .round-info { color: #888; font-size: 14px; margin-bottom: 10px; }
+        .play-again { background: #28a745; }
         .play-again:hover { background: #218838; }
-
-        .final-result {
-            font-size: 22px;
-            animation: fadeInUp 0.5s ease;
-        }
+        .final-result { font-size: 22px; animation: fadeInUp 0.5s ease; }
+        .waiting { font-size: 18px; color: #ff9800; font-weight: 600; margin-top: 15px; }
     </style>
 </head>
-<body>
+<body class="{{ theme }}">
+
+    <div class="menu-bar">
+        <button class="menu-btn" onclick="document.getElementById('settingsDropdown').classList.toggle('show')">☰ Menu</button>
+        <div class="dropdown" id="settingsDropdown">
+            <p>Game Mode</p>
+            <form method="POST">
+                <button name="game_mode" value="computer" class="{{ 'active' if game_mode == 'computer' else '' }}">Vs Computer</button>
+            </form>
+            <form method="POST">
+                <button name="game_mode" value="2player" class="{{ 'active' if game_mode == '2player' else '' }}">2 Player</button>
+            </form>
+
+            <p>Difficulty (Vs Computer)</p>
+            <form method="POST">
+                <button name="difficulty" value="easy" class="{{ 'active' if difficulty == 'easy' else '' }}">Easy</button>
+            </form>
+            <form method="POST">
+                <button name="difficulty" value="hard" class="{{ 'active' if difficulty == 'hard' else '' }}">Hard (Smart AI)</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="top-bar">
+        <form method="POST">
+            <button class="icon-btn" name="theme" value="{{ 'dark' if theme == 'light' else 'light' }}">
+                {{ '🌙' if theme == 'light' else '☀️' }}
+            </button>
+        </form>
+    </div>
+
     <div class="container">
         <h1>🪨📄✂️ Rock Paper Scissor</h1>
+        <p style="color:#888; font-size:14px;">Player: {{ name }}</p>
 
         {% if not started %}
             <h3>Choose match mode</h3>
             <div class="btn-group">
-                <form method="POST"><button name="mode" value="3">Best of 3</button></form>
-                <form method="POST"><button name="mode" value="5">Best of 5</button></form>
+                <form method="POST"><button class="primary" name="mode" value="3">Best of 3</button></form>
+                <form method="POST"><button class="primary" name="mode" value="5">Best of 5</button></form>
             </div>
         {% elif not match_over %}
-            <p class="round-info">Round {{ round + 1 }} of {{ total_rounds }}</p>
+            <p class="round-info">
+                Round {{ round + 1 }} of {{ total_rounds }}
+                {% if game_mode == "2player" %} — 2 Player Mode{% endif %}
+            </p>
+
+            {% if waiting_p2 %}
+                <p class="waiting">Player 1 chose! Player 2, make your move 👇</p>
+            {% elif game_mode == "2player" %}
+                <p class="waiting">Player 1, make your move 👇</p>
+            {% endif %}
 
             <form method="POST">
                 <div class="btn-group">
@@ -170,11 +255,11 @@
 
             {% if result %}
                 <div class="battle">
-                    {% if user_choice == "rock" %}🪨{% elif user_choice == "paper" %}📄{% else %}✂️{% endif %}
+                    {% if user_choice == "rock" %}🪨{% elif user_choice == "paper" %}📄{% elif user_choice == "scissor" %}✂️{% endif %}
                     ⚔️
-                    {% if comp_choice == "rock" %}🪨{% elif comp_choice == "paper" %}📄{% else %}✂️{% endif %}
+                    {% if comp_choice == "rock" %}🪨{% elif comp_choice == "paper" %}📄{% elif comp_choice == "scissor" %}✂️{% endif %}
                 </div>
-                <p class="choices-made">You: <b>{{ user_choice|capitalize }}</b> &nbsp;|&nbsp; Computer: <b>{{ comp_choice|capitalize }}</b></p>
+                <p class="choices-made">{{ user_choice }} &nbsp;|&nbsp; {{ comp_choice }}</p>
                 <p class="result {% if 'Win' in result %}win{% elif 'Lose' in result %}lose{% else %}draw{% endif %}">{{ result }}</p>
             {% endif %}
 
@@ -182,7 +267,7 @@
         {% else %}
             <p class="final-result result {% if 'won' in match_result %}win{% elif 'lost' in match_result %}lose{% else %}draw{% endif %}">{{ match_result }}</p>
             <p class="score">Final Score — Wins: {{ wins }} | Losses: {{ losses }} | Draws: {{ draws }}</p>
-            <a href="/reset"><button class="play-again">Play Again</button></a>
+            <a href="/reset"><button class="primary play-again">Play Again</button></a>
         {% endif %}
     </div>
 </body>
