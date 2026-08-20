@@ -1,20 +1,28 @@
 # 🪨📄✂️ Rock Paper Scissors Game
 
-A Rock Paper Scissors game built in Python — playable in the terminal or as a web app using Flask.
+A Rock Paper Scissors game built in Python — playable in the terminal or as a full-featured web app using Flask.
+
+_Last updated: August 2026_
 
 ## 📌 About
 
-This project started as a simple command-line Rock Paper Scissors game and has grown into a more complete app with input validation, multiple game modes, score tracking, and a web-based UI.
+This project started as a simple command-line Rock Paper Scissors game and has grown into a complete web app with login, game modes, difficulty levels, dark/light theme, and animations.
 
 ## 🚀 Features
 
 - Play Rock, Paper, or Scissors against the computer
-- Choose input mode: type words (`rock`, `paper`, `scissor`) or numbers (`0`, `1`, `2`)
+- Choose input mode (terminal version): words (`rock`, `paper`, `scissor`) or numbers (`0`, `1`, `2`)
 - Choose match mode: **Best of 3** or **Best of 5**
 - Live score tracking (wins / losses / draws) throughout the match
 - Final match result summary (win, lose, or draw the overall match)
 - Colored terminal output using `colorama` (green for win, red for loss, cyan for draw)
 - Web-based version using Flask, with clickable buttons instead of typing
+- Simple login screen (enter your name to start playing)
+- **2 Player mode** — play against a friend on the same device, with both player names shown
+- **Difficulty mode** (vs Computer): Easy (random) or Hard (computer tracks your most common move and counters it)
+- **Dark mode / Light mode** toggle
+- Menu bar to switch game mode and difficulty mid-session
+- Animated UI: fade-ins, button pop effects, and a "battle" emoji clash animation on each round
 
 ## 🛠️ Tech Stack
 
@@ -28,8 +36,11 @@ This project started as a simple command-line Rock Paper Scissors game and has g
 rps-project/
 ├── rps_terminal.py     # Core game logic + terminal version
 ├── app.py              # Flask web app (reuses logic from rps_terminal.py)
+├── requirements.txt    # Python dependencies
+├── .gitignore
 └── templates/
-    └── index.html      # Web UI
+    ├── login.html      # Name entry screen
+    └── index.html      # Main game UI
 ```
 
 ## ▶️ How to Run
@@ -43,15 +54,16 @@ python rps_terminal.py
 Follow the prompts to choose your input mode (words/numbers) and match mode (Best of 3/5).
 
 ### Web version
-1. Install Flask
+1. Install dependencies
    ```bash
-   pip install flask
+   pip install -r requirements.txt
    ```
 2. Run the app
    ```bash
    python app.py
    ```
 3. Open your browser at `http://127.0.0.1:5000`
+4. Enter your name, pick a game mode (Vs Computer / 2 Player) and difficulty from the menu, then play
 
 ## 🎮 Example (Terminal)
 
@@ -85,7 +97,7 @@ You won the match! 🎉
 - [ ] "Computer is choosing..." animation delay
 - [ ] Unit tests using `pytest`
 - [ ] Deploy the web version live (Render / PythonAnywhere)
-- [ ] Player vs Player mode
+- [ ] Package as an installable APK to share with friends
 
 ## 🤝 Contributing
 
@@ -94,6 +106,3 @@ This is a personal learning project, but suggestions and feedback are always wel
 ## 📄 License
 
 This project is open source and available under the [MIT License](LICENSE).
-## 👤 Author
-
-Made by [Aryan Bindage] =[https://github.com/bindagearyan-bit]
