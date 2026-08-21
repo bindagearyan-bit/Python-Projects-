@@ -5,6 +5,7 @@
     <style>
         * { box-sizing: border-box; }
 
+        /* ---------- Page background: purple wood + vignette ---------- */
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
             text-align: center;
@@ -13,144 +14,368 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.3s ease;
+            position: relative;
+            overflow-x: hidden;
+            /* Purple wood-grain base via layered gradients */
+            background-color: #4a2a5e;
+            background-image:
+                /* Vignette dark edges */
+                radial-gradient(ellipse at center,
+                    rgba(74,42,94,0) 0%,
+                    rgba(74,42,94,0) 45%,
+                    rgba(20,8,30,0.55) 88%,
+                    rgba(15,5,22,0.85) 100%),
+                /* Wood-grain stripes */
+                repeating-linear-gradient(102deg,
+                    rgba(255,255,255,0.025) 0px,
+                    rgba(255,255,255,0.025) 2px,
+                    rgba(0,0,0,0.05) 2px,
+                    rgba(0,0,0,0.05) 5px),
+                /* Knots/swirls */
+                radial-gradient(circle at 18% 22%, rgba(90,55,120,0.55) 0%, rgba(90,55,120,0) 8%),
+                radial-gradient(circle at 78% 70%, rgba(70,40,100,0.55) 0%, rgba(70,40,100,0) 10%),
+                radial-gradient(circle at 62% 18%, rgba(95,60,125,0.45) 0%, rgba(95,60,125,0) 6%),
+                radial-gradient(circle at 25% 85%, rgba(85,50,115,0.45) 0%, rgba(85,50,115,0) 7%),
+                /* Base purple gradient */
+                linear-gradient(160deg, #6a3a8c 0%, #4a2a5e 55%, #2f1842 100%);
+            background-attachment: fixed;
         }
 
-        body.light {
-            background: linear-gradient(135deg, #6a11cb, #2575fc);
+        /* ---------- Jungle leaf/vine corners (SVG, no broken image paths) ---------- */
+        .leaves-tl, .leaves-tr, .leaves-bl, .leaves-br {
+            position: fixed;
+            width: 260px;
+            height: 260px;
+            pointer-events: none;
+            z-index: 5;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.45));
+        }
+        .leaves-tl { top: 0; left: 0; }
+        .leaves-tr { top: 0; right: 0; transform: scaleX(-1); }
+        .leaves-bl { bottom: 0; left: 0; transform: scaleY(-1); }
+        .leaves-br { bottom: 0; right: 0; transform: scale(-1, -1); }
+        .leaves-tl svg, .leaves-tr svg, .leaves-bl svg, .leaves-br svg { width: 100%; height: 100%; }
+
+        /* Tiny sparkle accents */
+        .sparkle {
+            position: fixed;
+            color: #ffe27a;
+            font-size: 14px;
+            pointer-events: none;
+            z-index: 4;
+            text-shadow: 0 0 6px rgba(255,220,120,0.85), 0 0 2px #fff;
+            animation: twinkle 2.4s ease-in-out infinite;
+        }
+        .sparkle:nth-child(odd) { animation-delay: 0.6s; }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.35; transform: scale(0.85); }
+            50%      { opacity: 1;    transform: scale(1.15); }
         }
 
-        body.dark {
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-        }
-
+        /* ---------- Top bar / menu (kept locations, restyled) ---------- */
         .top-bar {
             position: fixed;
             top: 15px;
             right: 15px;
             display: flex;
             gap: 8px;
+            z-index: 50;
         }
 
         .top-bar form { margin: 0; }
 
         .icon-btn {
-            background: rgba(255,255,255,0.25);
-            border: none;
-            border-radius: 10px;
-            padding: 8px 12px;
-            font-size: 16px;
+            background: linear-gradient(180deg, #ffd76b 0%, #f5a623 55%, #c97a10 100%);
+            border: 3px solid #6b3a0a;
+            border-radius: 14px;
+            padding: 8px 14px;
+            font-size: 18px;
             cursor: pointer;
+            color: #fff;
+            font-weight: 800;
+            box-shadow:
+                inset 0 2px 0 rgba(255,255,255,0.55),
+                inset 0 -3px 0 rgba(0,0,0,0.25),
+                0 4px 0 #6b3a0a,
+                0 6px 10px rgba(0,0,0,0.35);
+            text-shadow: 1px 1px 0 #6b3a0a, -1px -1px 0 rgba(255,255,255,0.4);
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+        }
+        .icon-btn:active {
+            transform: translateY(3px);
+            box-shadow:
+                inset 0 2px 0 rgba(255,255,255,0.35),
+                inset 0 -2px 0 rgba(0,0,0,0.3),
+                0 1px 0 #6b3a0a;
         }
 
         .menu-bar {
             position: fixed;
             top: 15px;
             left: 15px;
+            z-index: 50;
         }
 
         .menu-btn {
-            background: rgba(255,255,255,0.25);
-            border: none;
-            border-radius: 10px;
-            padding: 8px 14px;
+            background: linear-gradient(180deg, #ffd76b 0%, #f5a623 55%, #c97a10 100%);
+            border: 3px solid #6b3a0a;
+            border-radius: 14px;
+            padding: 8px 16px;
             font-size: 15px;
             cursor: pointer;
+            color: #fff;
+            font-weight: 800;
+            box-shadow:
+                inset 0 2px 0 rgba(255,255,255,0.55),
+                inset 0 -3px 0 rgba(0,0,0,0.25),
+                0 4px 0 #6b3a0a,
+                0 6px 10px rgba(0,0,0,0.35);
+            text-shadow: 1px 1px 0 #6b3a0a;
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+        }
+        .menu-btn:active {
+            transform: translateY(3px);
+            box-shadow:
+                inset 0 2px 0 rgba(255,255,255,0.35),
+                0 1px 0 #6b3a0a;
         }
 
         .dropdown {
             display: none;
             position: absolute;
-            top: 45px;
+            top: 55px;
             left: 0;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
-            padding: 12px;
-            width: 200px;
+            /* stone-tablet dropdown */
+            background:
+                radial-gradient(circle at 30% 20%, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 40%),
+                linear-gradient(160deg, #d9c89a 0%, #b8a26d 100%);
+            border: 3px solid #5a3a18;
+            border-radius: 16px;
+            box-shadow:
+                inset 0 0 18px rgba(80,50,20,0.35),
+                0 8px 18px rgba(0,0,0,0.45);
+            padding: 14px;
+            width: 250px;
             text-align: left;
+            z-index: 100;
         }
 
         .dropdown.show { display: block; }
 
-        .dropdown p { margin: 6px 0; font-size: 14px; color: #333; font-weight: 600; }
+        .dropdown p {
+            margin: 8px 0 6px 0;
+            font-size: 14px;
+            color: #3a230a;
+            font-weight: 800;
+            text-shadow: 1px 1px 0 rgba(255,255,255,0.5);
+        }
 
         .dropdown form { margin-bottom: 10px; }
 
         .dropdown button {
             width: 100%;
-            padding: 8px;
+            padding: 9px;
             margin-top: 4px;
-            border: none;
-            border-radius: 8px;
-            background: #f4f4f8;
+            border: 2px solid #6b3a0a;
+            border-radius: 10px;
+            background: linear-gradient(180deg, #fff2c8, #f0d68a);
             cursor: pointer;
             font-size: 14px;
+            font-weight: 700;
+            color: #3a230a;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.7), 0 2px 0 #6b3a0a;
         }
 
         .dropdown button.active {
-            background: #2575fc;
-            color: white;
+            background: linear-gradient(180deg, #b6e07a, #5ea02a);
+            color: #1f3a0a;
+            border-color: #2c4a08;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.6), 0 2px 0 #2c4a08;
         }
 
+        /* ---------- Stone tablet container ---------- */
         .container {
-            background: white;
-            border-radius: 20px;
-            padding: 40px 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            max-width: 420px;
-            width: 90%;
+            position: relative;
+            /* Carved-stone texture (irregular via pseudo mask not needed; use chipped border-radius + texture) */
+            background:
+                /* crack lines */
+                linear-gradient(118deg, transparent 49.6%, rgba(60,40,20,0.25) 49.8%, transparent 50.2%),
+                linear-gradient(75deg,  transparent 39.2%, rgba(60,40,20,0.18) 39.4%, transparent 39.8%),
+                linear-gradient(140deg, transparent 71.5%, rgba(60,40,20,0.22) 71.7%, transparent 72.1%),
+                /* speckles */
+                radial-gradient(circle at 12% 18%, rgba(120,90,40,0.18) 0 2px, transparent 3px),
+                radial-gradient(circle at 78% 30%, rgba(120,90,40,0.18) 0 1.5px, transparent 3px),
+                radial-gradient(circle at 35% 80%, rgba(120,90,40,0.20) 0 2px, transparent 3px),
+                radial-gradient(circle at 88% 75%, rgba(120,90,40,0.18) 0 1.5px, transparent 3px),
+                radial-gradient(circle at 55% 55%, rgba(120,90,40,0.12) 0 2px, transparent 3px),
+                /* stone base gradient */
+                linear-gradient(160deg, #ece1c2 0%, #d5c69a 45%, #bfa876 100%);
+            border-radius: 38px 32px 42px 30px / 30px 42px 32px 38px; /* irregular chipped look */
+            padding: 38px 30px 30px 30px;
+            box-shadow:
+                /* deep inset carved edge */
+                inset 0 0 0 4px #8a6f3a,
+                inset 0 0 0 6px #d9c89a,
+                inset 0 0 28px rgba(80,50,20,0.45),
+                inset 0 6px 14px rgba(255,240,210,0.7),
+                inset 0 -8px 14px rgba(80,50,20,0.3),
+                /* outer drop */
+                0 18px 40px rgba(0,0,0,0.55),
+                0 4px 10px rgba(0,0,0,0.35);
+            max-width: 620px;
+            width: 92%;
+            color: #3a230a;
             animation: fadeInUp 0.5s ease;
+            margin: 24px 0;
         }
 
-        body.dark .container { background: #2c2c54; color: #eee; }
-        body.dark h1, body.dark h3, body.dark .round-info { color: #eee; }
-        body.dark .score { background: #3a3a6a; color: #eee; }
-        body.dark .choice-btn { background: #3a3a6a; }
-        body.dark .dropdown { background: #2c2c54; }
-        body.dark .dropdown p { color: #eee; }
-        body.dark .dropdown button { background: #3a3a6a; color: #eee; }
+        /* Gem/currency badge decorations on the tablet corners */
+        .gem-badge {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 800;
+            color: #fff;
+            text-shadow: 1px 1px 0 #1a0030, -1px 0 0 #1a0030;
+            font-size: 15px;
+        }
+        .gem-badge .gem {
+            width: 26px;
+            height: 26px;
+            display: inline-block;
+        }
+        .gem-badge.tl { top: 14px; left: 18px; }
+        .gem-badge.tr { top: 14px; right: 18px; }
+        .gem-badge.bl { bottom: 14px; left: 18px; }
+        .gem-badge.br { bottom: 14px; right: 18px; }
+
+        /* ---------- Stone tablet title ---------- */
+        .stone-title {
+            font-family: 'Segoe UI', 'Comic Sans MS', system-ui, sans-serif;
+            font-weight: 900;
+            font-size: 38px;
+            letter-spacing: 1px;
+            color: #fffdf3;
+            text-shadow:
+                2px 2px 0 #1a0a05,
+                -1px -1px 0 #1a0a05,
+                0 5px 0 #6b3a0a,
+                0 8px 12px rgba(0,0,0,0.45);
+            margin: 6px 0 10px 0;
+            line-height: 1.05;
+            transform: rotate(-1.2deg);
+        }
+        .stone-title .line2 {
+            display: block;
+            font-size: 32px;
+            transform: rotate(0.8deg);
+        }
+
+        h3 {
+            color: #4a2a08;
+            font-weight: 700;
+            margin-top: 14px;
+            text-shadow: 1px 1px 0 rgba(255,255,255,0.45);
+        }
+
+        .round-info {
+            color: #5a3a14;
+            font-size: 15px;
+            margin-bottom: 12px;
+            font-weight: 700;
+            text-shadow: 1px 1px 0 rgba(255,255,255,0.4);
+        }
 
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        h1 { color: #2c2c54; margin-bottom: 10px; font-size: 26px; }
-        h3 { color: #555; font-weight: 500; }
-
+        /* ---------- Chunky 3D beveled buttons ---------- */
         .btn-group {
             display: flex;
             justify-content: center;
-            gap: 12px;
+            gap: 16px;
             flex-wrap: wrap;
-            margin: 20px 0;
+            margin: 22px 0;
         }
 
         button.primary {
-            font-size: 16px;
-            padding: 12px 22px;
-            border: none;
-            border-radius: 12px;
+            font-size: 17px;
+            padding: 14px 26px;
+            border: 3px solid #6b3a0a;
+            border-radius: 999px;
             cursor: pointer;
-            background: #2575fc;
-            color: white;
-            font-weight: 600;
-            transition: transform 0.15s ease, background 0.2s ease;
+            background: linear-gradient(180deg, #ffe27a 0%, #f5a623 50%, #c97a10 100%);
+            color: #fffdf3;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            box-shadow:
+                inset 0 3px 0 rgba(255,255,255,0.65),
+                inset 0 -4px 0 rgba(0,0,0,0.25),
+                0 5px 0 #6b3a0a,
+                0 7px 12px rgba(0,0,0,0.35);
+            text-shadow: 1px 1px 0 #6b3a0a, -1px 0 0 #6b3a0a;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.12s ease, box-shadow 0.12s ease;
+        }
+        button.primary::after {
+            content: "›";
+            font-size: 22px;
+            font-weight: 900;
+            line-height: 1;
+            margin-left: 2px;
+        }
+        button.primary:hover {
+            filter: brightness(1.05);
+        }
+        button.primary:active {
+            transform: translateY(4px);
+            box-shadow:
+                inset 0 2px 0 rgba(255,255,255,0.4),
+                inset 0 -2px 0 rgba(0,0,0,0.25),
+                0 1px 0 #6b3a0a,
+                0 3px 6px rgba(0,0,0,0.3);
         }
 
-        button.primary:hover { background: #1a5edb; transform: translateY(-2px); }
-        button.primary:active { transform: scale(0.92); }
+        /* secondary (green) variant for the 2-player Save / Play Again / etc. */
+        button.primary.green {
+            background: linear-gradient(180deg, #a8e36a 0%, #5ea02a 55%, #2c6608 100%);
+            border-color: #1f3a0a;
+            box-shadow:
+                inset 0 3px 0 rgba(255,255,255,0.55),
+                inset 0 -4px 0 rgba(0,0,0,0.25),
+                0 5px 0 #1f3a0a,
+                0 7px 12px rgba(0,0,0,0.35);
+            text-shadow: 1px 1px 0 #1f3a0a;
+        }
+        button.primary.green:active {
+            box-shadow:
+                inset 0 2px 0 rgba(255,255,255,0.35),
+                inset 0 -2px 0 rgba(0,0,0,0.25),
+                0 1px 0 #1f3a0a;
+        }
 
+        /* Choice (rock/paper/scissor) emoji buttons — stone chunky */
         .choice-btn {
-            font-size: 28px;
-            padding: 16px 20px;
-            background: #f4f4f8;
-            border: none;
-            border-radius: 12px;
-            color: #2c2c54;
+            font-size: 38px;
+            padding: 18px 24px;
+            background: linear-gradient(180deg, #fff2c8 0%, #e6d29a 100%);
+            border: 3px solid #6b3a0a;
+            border-radius: 22px;
+            color: #3a230a;
             cursor: pointer;
+            transition: transform 0.18s ease, filter 0.2s ease;
             animation: popIn 0.4s ease backwards;
+            box-shadow:
+                inset 0 3px 0 rgba(255,255,255,0.6),
+                inset 0 -3px 0 rgba(0,0,0,0.15),
+                0 5px 0 #6b3a0a,
+                0 7px 12px rgba(0,0,0,0.3);
+            text-shadow: 1px 1px 0 #fff;
         }
 
         .choice-btn:nth-child(1) { animation-delay: 0.05s; }
@@ -162,9 +387,24 @@
             to { opacity: 1; transform: scale(1); }
         }
 
-        .choice-btn:hover { background: #e4e4f0; transform: translateY(-2px) rotate(-4deg); }
+        .choice-btn:hover {
+            filter: brightness(1.05);
+            transform: translateY(-2px) scale(1.04);
+        }
+        .choice-btn:active {
+            transform: translateY(3px);
+            box-shadow:
+                inset 0 2px 0 rgba(255,255,255,0.5),
+                inset 0 -2px 0 rgba(0,0,0,0.2),
+                0 2px 0 #6b3a0a;
+        }
 
-        .battle { font-size: 40px; margin: 15px 0; animation: clash 0.6s ease; }
+        .battle {
+            font-size: 46px;
+            margin: 18px 0;
+            animation: clash 0.6s ease;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
+        }
 
         @keyframes clash {
             0% { transform: scale(0.5); opacity: 0; }
@@ -172,27 +412,320 @@
             100% { transform: scale(1); opacity: 1; }
         }
 
-        .result { font-size: 24px; margin-top: 15px; font-weight: 700; animation: resultPop 0.4s ease; }
+        .result {
+            font-size: 26px;
+            margin-top: 15px;
+            font-weight: 900;
+            animation: resultPop 0.4s ease;
+            color: #3a230a;
+            text-shadow: 2px 2px 0 #fff5d8, 0 0 8px rgba(0,0,0,0.25);
+        }
 
         @keyframes resultPop {
             from { opacity: 0; transform: scale(0.7); }
             to { opacity: 1; transform: scale(1); }
         }
 
-        .result.win { color: #28a745; }
-        .result.lose { color: #dc3545; }
-        .result.draw { color: #ff9800; }
+        .result.win  { color: #2a6a08; }
+        .result.lose { color: #8a1414; }
+        .result.draw { color: #8a5500; }
 
-        .choices-made { font-size: 15px; margin: 4px 0; }
-        .score { margin-top: 20px; font-size: 15px; background: #f4f4f8; padding: 10px; border-radius: 10px; }
-        .round-info { color: #888; font-size: 14px; margin-bottom: 10px; }
-        .play-again { background: #28a745; }
-        .play-again:hover { background: #218838; }
-        .final-result { font-size: 22px; animation: fadeInUp 0.5s ease; }
-        .waiting { font-size: 18px; color: #ff9800; font-weight: 600; margin-top: 15px; }
+        .choices-made {
+            font-size: 16px;
+            margin: 6px 0;
+            font-weight: 700;
+            color: #4a2a08;
+            text-shadow: 1px 1px 0 rgba(255,255,255,0.45);
+        }
+
+        .score {
+            margin-top: 22px;
+            font-size: 16px;
+            background: linear-gradient(180deg, #fff2c8, #e6d29a);
+            padding: 12px 16px;
+            border-radius: 14px;
+            font-weight: 800;
+            color: #3a230a;
+            border: 3px solid #6b3a0a;
+            box-shadow:
+                inset 0 2px 0 rgba(255,255,255,0.55),
+                inset 0 -2px 0 rgba(0,0,0,0.15),
+                0 4px 0 #6b3a0a;
+        }
+
+        .play-again { /* green variant handled below */
+            background: linear-gradient(180deg, #a8e36a 0%, #5ea02a 55%, #2c6608 100%);
+            border-color: #1f3a0a;
+            box-shadow:
+                inset 0 3px 0 rgba(255,255,255,0.55),
+                inset 0 -4px 0 rgba(0,0,0,0.25),
+                0 5px 0 #1f3a0a,
+                0 7px 12px rgba(0,0,0,0.35);
+        }
+        .play-again:hover { filter: brightness(1.05); }
+
+        .final-result {
+            font-size: 26px;
+            animation: fadeInUp 0.5s ease;
+            font-weight: 900;
+            color: #3a230a;
+            text-shadow: 2px 2px 0 #fff5d8, 0 0 8px rgba(0,0,0,0.25);
+        }
+        .waiting {
+            font-size: 18px;
+            color: #6b3a0a;
+            font-weight: 800;
+            margin-top: 15px;
+            text-shadow: 1px 1px 0 rgba(255,255,255,0.5);
+        }
+
+        .player-names-card {
+            background:
+                radial-gradient(circle at 20% 20%, rgba(255,255,255,0.25) 0%, transparent 40%),
+                linear-gradient(160deg, #f4e8c4 0%, #d5c08c 100%);
+            border: 3px solid #6b3a0a;
+            border-radius: 16px;
+            padding: 14px 18px;
+            margin: 14px 0 18px 0;
+            text-align: left;
+            box-shadow:
+                inset 0 2px 0 rgba(255,255,255,0.6),
+                inset 0 -2px 0 rgba(0,0,0,0.15),
+                0 4px 0 #6b3a0a;
+        }
+
+        .player-names-card h4 {
+            margin: 0 0 8px 0;
+            font-size: 14px;
+            color: #4a2a08;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            font-weight: 900;
+        }
+
+        .names-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .name-input {
+            flex: 1;
+            min-width: 120px;
+            padding: 9px 12px;
+            border-radius: 10px;
+            border: 2px solid #6b3a0a;
+            font-size: 14px;
+            background: #fffdf3;
+            color: #3a230a;
+            font-weight: 600;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.15);
+        }
+        .name-input:focus {
+            outline: none;
+            border-color: #f5a623;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.15), 0 0 0 3px rgba(245,166,35,0.4);
+        }
+
+        .save-names-btn {
+            padding: 9px 16px;
+            background: linear-gradient(180deg, #a8e36a 0%, #5ea02a 55%, #2c6608 100%);
+            color: #fffdf3;
+            border: 3px solid #1f3a0a;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 900;
+            cursor: pointer;
+            box-shadow:
+                inset 0 2px 0 rgba(255,255,255,0.55),
+                inset 0 -3px 0 rgba(0,0,0,0.25),
+                0 4px 0 #1f3a0a;
+            text-shadow: 1px 1px 0 #1f3a0a;
+            letter-spacing: 0.5px;
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+        }
+        .save-names-btn:active {
+            transform: translateY(3px);
+            box-shadow:
+                inset 0 2px 0 rgba(255,255,255,0.35),
+                inset 0 -2px 0 rgba(0,0,0,0.3),
+                0 1px 0 #1f3a0a;
+        }
+
+        /* ---------- Bottom circular icon row (!, sound, music) ---------- */
+        .bottom-icons {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            margin-top: 18px;
+        }
+        .circle-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(180deg, #ffe27a 0%, #f5a623 55%, #c97a10 100%);
+            border: 3px solid #6b3a0a;
+            color: #fffdf3;
+            font-weight: 900;
+            font-size: 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            text-shadow: 1px 1px 0 #6b3a0a;
+            box-shadow:
+                inset 0 2px 0 rgba(255,255,255,0.55),
+                inset 0 -3px 0 rgba(0,0,0,0.25),
+                0 4px 0 #6b3a0a,
+                0 6px 10px rgba(0,0,0,0.3);
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+        }
+        .circle-icon:active {
+            transform: translateY(3px);
+            box-shadow:
+                inset 0 2px 0 rgba(255,255,255,0.35),
+                inset 0 -2px 0 rgba(0,0,0,0.3),
+                0 1px 0 #6b3a0a;
+        }
+
+        /* Inline "Player:" text uses stone-styled span */
+        .player-tag {
+            display: inline-block;
+            background: linear-gradient(180deg, #fff2c8, #e6d29a);
+            border: 2px solid #6b3a0a;
+            padding: 4px 12px;
+            border-radius: 999px;
+            color: #3a230a;
+            font-weight: 800;
+            font-size: 14px;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.6), 0 2px 0 #6b3a0a;
+        }
+
+        .vs-tag {
+            font-weight: 900;
+            color: #6b3a0a;
+            text-shadow: 1px 1px 0 rgba(255,255,255,0.5);
+        }
+
+        /* Responsive tweaks */
+        @media (max-width: 520px) {
+            .stone-title { font-size: 30px; }
+            .stone-title .line2 { font-size: 26px; }
+            .container { padding: 28px 18px 22px 18px; }
+            .leaves-tl, .leaves-tr, .leaves-bl, .leaves-br { width: 170px; height: 170px; }
+            .gem-badge { font-size: 12px; }
+            .gem-badge .gem { width: 20px; height: 20px; }
+            button.primary { font-size: 15px; padding: 12px 18px; }
+            .choice-btn { font-size: 32px; padding: 14px 18px; }
+        }
     </style>
 </head>
 <body class="{{ theme }}">
+
+    <!-- Jungle leaves at corners (SVG, no external image paths) -->
+    <div class="leaves-tl">
+        <svg viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <radialGradient id="leafA" cx="0.3" cy="0.3" r="0.8">
+                    <stop offset="0%" stop-color="#7fd14a"/>
+                    <stop offset="60%" stop-color="#3a8a1a"/>
+                    <stop offset="100%" stop-color="#1d4a0a"/>
+                </radialGradient>
+                <radialGradient id="leafB" cx="0.3" cy="0.3" r="0.8">
+                    <stop offset="0%" stop-color="#a8e36a"/>
+                    <stop offset="60%" stop-color="#4ea020"/>
+                    <stop offset="100%" stop-color="#235a08"/>
+                </radialGradient>
+            </defs>
+            <!-- Vine -->
+            <path d="M 0 30 Q 80 60 130 130 Q 180 200 240 250" stroke="#3a2a0a" stroke-width="5" fill="none" stroke-linecap="round"/>
+            <path d="M 0 30 Q 80 60 130 130 Q 180 200 240 250" stroke="#7a5a2a" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.7"/>
+            <!-- Leaves -->
+            <ellipse cx="40"  cy="40"  rx="38" ry="18" fill="url(#leafA)" transform="rotate(-30 40 40)"/>
+            <ellipse cx="90"  cy="60"  rx="34" ry="16" fill="url(#leafB)" transform="rotate(20 90 60)"/>
+            <ellipse cx="70"  cy="100" rx="40" ry="18" fill="url(#leafA)" transform="rotate(-50 70 100)"/>
+            <ellipse cx="130" cy="120" rx="36" ry="17" fill="url(#leafB)" transform="rotate(40 130 120)"/>
+            <ellipse cx="110" cy="170" rx="42" ry="19" fill="url(#leafA)" transform="rotate(-20 110 170)"/>
+            <ellipse cx="170" cy="190" rx="38" ry="18" fill="url(#leafB)" transform="rotate(60 170 190)"/>
+            <ellipse cx="210" cy="220" rx="34" ry="16" fill="url(#leafA)" transform="rotate(-10 210 220)"/>
+            <!-- veins -->
+            <g stroke="#1a3a05" stroke-width="1.2" fill="none" opacity="0.55">
+                <path d="M 10 35 L 70 45"/>
+                <path d="M 55 50 L 120 70"/>
+                <path d="M 40 85 L 100 110"/>
+                <path d="M 95 110 L 165 130"/>
+                <path d="M 70 155 L 150 180"/>
+                <path d="M 135 175 L 205 200"/>
+                <path d="M 175 205 L 245 235"/>
+            </g>
+        </svg>
+    </div>
+    <div class="leaves-tr">
+        <svg viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <radialGradient id="leafC" cx="0.3" cy="0.3" r="0.8">
+                    <stop offset="0%" stop-color="#7fd14a"/>
+                    <stop offset="60%" stop-color="#3a8a1a"/>
+                    <stop offset="100%" stop-color="#1d4a0a"/>
+                </radialGradient>
+            </defs>
+            <path d="M 260 40 Q 180 70 130 140 Q 80 210 20 250" stroke="#3a2a0a" stroke-width="5" fill="none" stroke-linecap="round"/>
+            <ellipse cx="220" cy="50"  rx="38" ry="18" fill="url(#leafC)" transform="rotate(30 220 50)"/>
+            <ellipse cx="170" cy="70"  rx="34" ry="16" fill="url(#leafC)" transform="rotate(-20 170 70)"/>
+            <ellipse cx="190" cy="110" rx="40" ry="18" fill="url(#leafC)" transform="rotate(50 190 110)"/>
+            <ellipse cx="130" cy="130" rx="36" ry="17" fill="url(#leafC)" transform="rotate(-40 130 130)"/>
+            <ellipse cx="150" cy="180" rx="42" ry="19" fill="url(#leafC)" transform="rotate(20 150 180)"/>
+            <ellipse cx="90"  cy="200" rx="38" ry="18" fill="url(#leafC)" transform="rotate(-60 90 200)"/>
+            <ellipse cx="50"  cy="230" rx="34" ry="16" fill="url(#leafC)" transform="rotate(10 50 230)"/>
+        </svg>
+    </div>
+    <div class="leaves-bl">
+        <svg viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <radialGradient id="leafD" cx="0.3" cy="0.3" r="0.8">
+                    <stop offset="0%" stop-color="#a8e36a"/>
+                    <stop offset="60%" stop-color="#4ea020"/>
+                    <stop offset="100%" stop-color="#235a08"/>
+                </radialGradient>
+            </defs>
+            <path d="M 0 230 Q 80 200 130 130 Q 180 60 240 10" stroke="#3a2a0a" stroke-width="5" fill="none" stroke-linecap="round"/>
+            <ellipse cx="40"  cy="220" rx="38" ry="18" fill="url(#leafD)" transform="rotate(30 40 220)"/>
+            <ellipse cx="90"  cy="200" rx="34" ry="16" fill="url(#leafD)" transform="rotate(-20 90 200)"/>
+            <ellipse cx="70"  cy="160" rx="40" ry="18" fill="url(#leafD)" transform="rotate(50 70 160)"/>
+            <ellipse cx="130" cy="140" rx="36" ry="17" fill="url(#leafD)" transform="rotate(-40 130 140)"/>
+            <ellipse cx="110" cy="90"  rx="42" ry="19" fill="url(#leafD)" transform="rotate(20 110 90)"/>
+            <ellipse cx="170" cy="70"  rx="38" ry="18" fill="url(#leafD)" transform="rotate(-60 170 70)"/>
+            <ellipse cx="210" cy="40"  rx="34" ry="16" fill="url(#leafD)" transform="rotate(10 210 40)"/>
+        </svg>
+    </div>
+    <div class="leaves-br">
+        <svg viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <radialGradient id="leafE" cx="0.3" cy="0.3" r="0.8">
+                    <stop offset="0%" stop-color="#7fd14a"/>
+                    <stop offset="60%" stop-color="#3a8a1a"/>
+                    <stop offset="100%" stop-color="#1d4a0a"/>
+                </radialGradient>
+            </defs>
+            <path d="M 260 230 Q 180 200 130 130 Q 80 60 20 10" stroke="#3a2a0a" stroke-width="5" fill="none" stroke-linecap="round"/>
+            <ellipse cx="220" cy="220" rx="38" ry="18" fill="url(#leafE)" transform="rotate(-30 220 220)"/>
+            <ellipse cx="170" cy="200" rx="34" ry="16" fill="url(#leafE)" transform="rotate(20 170 200)"/>
+            <ellipse cx="190" cy="160" rx="40" ry="18" fill="url(#leafE)" transform="rotate(-50 190 160)"/>
+            <ellipse cx="130" cy="140" rx="36" ry="17" fill="url(#leafE)" transform="rotate(40 130 140)"/>
+            <ellipse cx="150" cy="90"  rx="42" ry="19" fill="url(#leafE)" transform="rotate(-20 150 90)"/>
+            <ellipse cx="90"  cy="70"  rx="38" ry="18" fill="url(#leafE)" transform="rotate(60 90 70)"/>
+            <ellipse cx="50"  cy="40"  rx="34" ry="16" fill="url(#leafE)" transform="rotate(-10 50 40)"/>
+        </svg>
+    </div>
+
+    <!-- Sparkle accents -->
+    <div class="sparkle" style="top: 80px;  left: 26%;">✦</div>
+    <div class="sparkle" style="top: 130px; right: 28%;">✧</div>
+    <div class="sparkle" style="bottom: 110px; left: 22%;">✦</div>
+    <div class="sparkle" style="bottom: 80px;  right: 24%;">✧</div>
+    <div class="sparkle" style="top: 45%; left: 8%;">✧</div>
+    <div class="sparkle" style="top: 55%; right: 8%;">✦</div>
 
     <div class="menu-bar">
         <button class="menu-btn" onclick="document.getElementById('settingsDropdown').classList.toggle('show')">☰ Menu</button>
@@ -224,8 +757,55 @@
     </div>
 
     <div class="container">
-        <h1>🪨📄✂️ Rock Paper Scissor</h1>
-        <p style="color:#888; font-size:14px;">Player: {{ name }}</p>
+
+        <!-- Gem badges in the tablet corners -->
+        <div class="gem-badge tl">
+            <svg class="gem" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="gemPurple" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%"  stop-color="#c8a8ff"/>
+                        <stop offset="50%" stop-color="#7a3adf"/>
+                        <stop offset="100%" stop-color="#2a0a5a"/>
+                    </linearGradient>
+                </defs>
+                <polygon points="16,2 28,11 24,28 8,28 4,11" fill="url(#gemPurple)" stroke="#1a0030" stroke-width="1.5" stroke-linejoin="round"/>
+                <polygon points="16,2 22,11 16,14 10,11" fill="#e6d4ff" opacity="0.85"/>
+                <polygon points="16,14 22,11 24,28 16,22" fill="#4a1aa0" opacity="0.55"/>
+            </svg>
+            <span>1,250</span>
+        </div>
+        <div class="gem-badge tr">
+            <svg class="gem" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="gemBlue" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%"  stop-color="#a8e0ff"/>
+                        <stop offset="50%" stop-color="#3a8adf"/>
+                        <stop offset="100%" stop-color="#0a2a5a"/>
+                    </linearGradient>
+                </defs>
+                <polygon points="16,2 28,11 24,28 8,28 4,11" fill="url(#gemBlue)" stroke="#001030" stroke-width="1.5" stroke-linejoin="round"/>
+                <polygon points="16,2 22,11 16,14 10,11" fill="#d4eaff" opacity="0.85"/>
+                <polygon points="16,14 22,11 24,28 16,22" fill="#1a4aa0" opacity="0.55"/>
+            </svg>
+            <span>340</span>
+        </div>
+
+        <h1 class="stone-title">🪨📄✂️ Rock Paper<span class="line2">Scissor</span></h1>
+
+        {% if game_mode == "2player" %}
+            <div class="player-names-card">
+                <h4>🎮 2-Player Setup</h4>
+                <form method="POST" class="names-row">
+                    <input type="hidden" name="update_names" value="1">
+                    <input type="text" name="p1_name" class="name-input" value="{{ p1_name }}" placeholder="Player 1 Name" required>
+                    <span class="vs-tag">vs</span>
+                    <input type="text" name="p2_name" class="name-input" value="{{ p2_name }}" placeholder="Player 2 Name" required>
+                    <button type="submit" class="save-names-btn">Save</button>
+                </form>
+            </div>
+        {% else %}
+            <p style="margin-bottom: 14px;"><span class="player-tag">Player: <strong>{{ name }}</strong></span></p>
+        {% endif %}
 
         {% if not started %}
             <h3>Choose match mode</h3>
@@ -240,9 +820,9 @@
             </p>
 
             {% if waiting_p2 %}
-                <p class="waiting">Player 1 chose! Player 2, make your move 👇</p>
+                <p class="waiting">🎮 {{ p1_name }} chose! {{ p2_name }}, make your move 👇</p>
             {% elif game_mode == "2player" %}
-                <p class="waiting">Player 1, make your move 👇</p>
+                <p class="waiting">🎮 {{ p1_name }}, make your move 👇</p>
             {% endif %}
 
             <form method="POST">
@@ -260,15 +840,30 @@
                     {% if comp_choice == "rock" %}🪨{% elif comp_choice == "paper" %}📄{% elif comp_choice == "scissor" %}✂️{% endif %}
                 </div>
                 <p class="choices-made">{{ user_choice }} &nbsp;|&nbsp; {{ comp_choice }}</p>
-                <p class="result {% if 'Win' in result %}win{% elif 'Lose' in result %}lose{% else %}draw{% endif %}">{{ result }}</p>
+                <p class="result {% if 'Win' in result or 'won' in result %}win{% elif 'Lose' in result or 'lost' in result %}lose{% else %}draw{% endif %}">{{ result }}</p>
             {% endif %}
 
-            <p class="score">Wins: {{ wins }} &nbsp;|&nbsp; Losses: {{ losses }} &nbsp;|&nbsp; Draws: {{ draws }}</p>
+            {% if game_mode == "2player" %}
+                <p class="score">{{ p1_name }}: {{ wins }} &nbsp;|&nbsp; {{ p2_name }}: {{ losses }} &nbsp;|&nbsp; Draws: {{ draws }}</p>
+            {% else %}
+                <p class="score">Wins: {{ wins }} &nbsp;|&nbsp; Losses: {{ losses }} &nbsp;|&nbsp; Draws: {{ draws }}</p>
+            {% endif %}
         {% else %}
-            <p class="final-result result {% if 'won' in match_result %}win{% elif 'lost' in match_result %}lose{% else %}draw{% endif %}">{{ match_result }}</p>
-            <p class="score">Final Score — Wins: {{ wins }} | Losses: {{ losses }} | Draws: {{ draws }}</p>
+            <p class="final-result {% if 'won' in match_result %}win{% elif 'lost' in match_result %}lose{% else %}draw{% endif %}">{{ match_result }}</p>
+            {% if game_mode == "2player" %}
+                <p class="score">Final Score — {{ p1_name }}: {{ wins }} | {{ p2_name }}: {{ losses }} | Draws: {{ draws }}</p>
+            {% else %}
+                <p class="score">Final Score — Wins: {{ wins }} | Losses: {{ losses }} | Draws: {{ draws }}</p>
+            {% endif %}
             <a href="/reset"><button class="primary play-again">Play Again</button></a>
         {% endif %}
+
+        <!-- Bottom circular icons (! info, sound, music) -->
+        <div class="bottom-icons">
+            <button type="button" class="circle-icon" title="Info">!</button>
+            <button type="button" class="circle-icon" title="Sound">🔊</button>
+            <button type="button" class="circle-icon" title="Music">♪</button>
+        </div>
     </div>
 </body>
 </html>

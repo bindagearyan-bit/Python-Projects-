@@ -47,11 +47,10 @@ def play_game(input_mode):
         print(Fore.RED + "You Lose!")
     return score
 
-print("=" * 30)
-print("  ROCK PAPER SCISSOR GAME")
-print("=" * 30)
-
 if __name__ == "__main__":
+    print("=" * 30)
+    print("  ROCK PAPER SCISSOR GAME")
+    print("=" * 30)
     print("Choose input mode:")
     print("1. Words (rock, paper, scissor)")
     print("2. Numbers (0, 1, 2)")
