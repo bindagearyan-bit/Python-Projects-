@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Rules · Rock Paper Scissors{% endblock %}
+
+{% block extra_css %}
+<style>
+    .rules-section {
+        margin-top: 10px;
+    }
+
+    .rule-card {
+        background: rgba(28, 27, 31, 0.04);
+        border: 1px dashed #c9bb98;
+        padding: 14px 16px;
+        margin-bottom: 14px;
+        border-radius: 4px;
+    }
+
+    .rule-title {
+        font-family: 'Space Mono', monospace;
+        font-size: 13px;
+        font-weight: 700;
+        color: #C1272D;
+        margin-bottom: 6px;
+        letter-spacing: 1px;
+    }
+
+    .rule-body {
+        font-family: 'Inter', sans-serif;
+        font-size: 13px;
+        color: #1C1B1F;
+        line-height: 1.5;
+    }
+
+    .hand-matrix {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        font-family: 'Space Mono', monospace;
+        font-size: 13px;
+        font-weight: 700;
+        margin: 12px 0 6px;
+        color: #1C1B1F;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <p class="eyebrow">OFFICIAL ARENA GUIDE</p>
+    <h1>HOW TO PLAY</h1>
+    <p class="player-tag">RULES & MATCH FORMATS</p>
+
+    <div class="rules-section">
+        <div class="rule-card">
+            <div class="rule-title">CORE WEAPONS & COUNTERS</div>
+            <div class="hand-matrix">
+                <span>🪨 BEATS ✂️</span>
+                <span>✂️ BEATS 📄</span>
+                <span>📄 BEATS 🪨</span>
+            </div>
+            <div class="rule-body" style="text-align: center; margin-top: 6px;">
+                Same choice results in a Draw.
+            </div>
+        </div>
+
+        <div class="rule-card">
+            <div class="rule-title">MATCH LENGTH</div>
+            <div class="rule-body">
+                Choose between <strong>Best of 3</strong> or <strong>Best of 5</strong> rounds. The player with the most round victories at the end wins the match.
+            </div>
+        </div>
+
+        <div class="rule-card">
+            <div class="rule-title">DIFFICULTY MODES</div>
+            <div class="rule-body">
+                • <strong>Easy:</strong> Computer makes completely random moves.<br>
+                • <strong>Hard (Smart AI):</strong> Computer tracks your historical move choices and plays counter-moves against your most frequent choice.
+            </div>
+        </div>
+
+        <div class="rule-card">
+            <div class="rule-title">2 PLAYER MODE</div>
+            <div class="rule-body">
+                Play locally with a friend on the same device! Player 1 locks in a secret choice first, followed by Player 2 before the round battle is revealed.
+            </div>
+        </div>
+
+        <div class="btn-group" style="margin-top: 20px;">
+            <a href="/game" class="btn-primary" onclick="playSound('click')">START PLAYING</a>
+        </div>
+    </div>
+{% endblock %}
