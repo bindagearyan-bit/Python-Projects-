@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}About · Match Ticket Arena{% endblock %}
+
+{% block extra_css %}
+<style>
+    .about-section {
+        margin-top: 10px;
+    }
+
+    .about-card {
+        border: 1px dashed;
+        padding: 14px 16px;
+        margin-bottom: 14px;
+        border-radius: 4px;
+    }
+    body.light .about-card { background: rgba(28, 27, 31, 0.04); border-color: #c9bb98; }
+    body.dark .about-card { background: rgba(245, 233, 211, 0.05); border-color: #454037; }
+
+    .about-title {
+        font-family: 'Space Mono', monospace;
+        font-size: 13px;
+        font-weight: 700;
+        color: #C1272D;
+        margin-bottom: 6px;
+        letter-spacing: 1px;
+    }
+
+    .about-body {
+        font-family: 'Inter', sans-serif;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+    body.light .about-body { color: #1C1B1F; }
+    body.dark .about-body { color: #F5E9D3; }
+
+    .tag-grid {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 8px;
+    }
+
+    .tag {
+        font-family: 'Space Mono', monospace;
+        font-size: 11px;
+        padding: 4px 8px;
+        border-radius: 3px;
+        background: rgba(193, 39, 45, 0.12);
+        color: #C1272D;
+        font-weight: 700;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <p class="eyebrow">EDITION & CREDITS</p>
+    <h1>ABOUT MATCH TICKET</h1>
+    <p class="player-tag">VINTAGE TICKETING EXPERIENCE</p>
+
+    <div class="about-section">
+        <div class="about-card">
+            <div class="about-title">DESIGN CONCEPT</div>
+            <div class="about-body">
+                "Match Ticket" brings the classic Rock Paper Scissors game into a sleek, warm parchment ticket-stub UI. Inspired by vintage admission tickets, it pairs bold <strong>Bebas Neue</strong> headlines with retro <strong>Space Mono</strong> scoring data and deep crimson red (<code>#C1272D</code>) accents.
+            </div>
+        </div>
+
+        <div class="about-card">
+            <div class="about-title">TECH STACK</div>
+            <div class="about-body">
+                Built with Python <strong>Flask</strong>, dynamic <strong>Jinja2</strong> templates, lightweight in-memory session management, and HTML5 Canvas confetti celebrations.
+            </div>
+            <div class="tag-grid">
+                <span class="tag">FLASK 3.x</span>
+                <span class="tag">JINJA2</span>
+                <span class="tag">BEBAS NEUE</span>
+                <span class="tag">SPACE MONO</span>
+                <span class="tag">NO-SFX</span>
+            </div>
+        </div>
+
+        <div class="about-card">
+            <div class="about-title">SMART COUNTER-AI</div>
+            <div class="about-body">
+                Hard difficulty mode incorporates pattern tracking that records your historical choices and calculates optimal counter-moves to challenge seasoned players.
+            </div>
+        </div>
+
+        <div class="btn-group" style="margin-top: 20px;">
+            <a href="/game" class="btn-primary">BACK TO GAME</a>
+        </div>
+    </div>
+{% endblock %}

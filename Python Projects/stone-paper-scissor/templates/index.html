@@ -1,335 +1,329 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Rock Paper Scissors</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+{% extends "base.html" %}
 
-        body {
-            font-family: 'Inter', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.3s ease;
-        }
+{% block title %}Arena Gameplay · Match Ticket{% endblock %}
 
-        body.dark {
-            background: #1C1B1F;
-            background-image: radial-gradient(circle at 20% 20%, #2A2830 0%, #1C1B1F 60%);
-        }
+{% block extra_css %}
+<style>
+    .round-info {
+        font-family: 'Space Mono', monospace;
+        font-size: 12px;
+        letter-spacing: 2px;
+        text-align: center;
+        margin-bottom: 8px;
+    }
+    body.light .round-info { color: #6b6455; }
+    body.dark .round-info { color: #A8A090; }
 
-        body.light {
-            background: #ECE1C8;
-            background-image: radial-gradient(circle at 20% 20%, #F5E9D3 0%, #ECE1C8 60%);
-        }
+    .mode-select-bar {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        margin-bottom: 14px;
+        flex-wrap: wrap;
+    }
 
-        /* Top bars */
-        .menu-bar, .top-bar {
-            position: fixed;
-            top: 20px;
-        }
-        .menu-bar { left: 20px; }
-        .top-bar { right: 20px; }
+    .mode-btn {
+        font-family: 'Space Mono', monospace;
+        font-size: 10px;
+        letter-spacing: 1px;
+        padding: 4px 8px;
+        border: 1px solid;
+        background: transparent;
+        cursor: pointer;
+        border-radius: 3px;
+        transition: all 0.15s ease;
+    }
+    body.light .mode-btn { border-color: #c9bb98; color: #1C1B1F; }
+    body.dark .mode-btn { border-color: #454037; color: #F5E9D3; }
+    
+    .mode-btn.active {
+        background: #C1272D !important;
+        border-color: #C1272D !important;
+        color: #F5E9D3 !important;
+        font-weight: bold;
+    }
 
-        .icon-btn, .menu-btn {
-            font-family: 'Space Mono', monospace;
-            font-size: 13px;
-            letter-spacing: 1px;
-            background: rgba(255,255,255,0.1);
-            color: #F5E9D3;
-            border: 1px solid rgba(245,233,211,0.3);
-            padding: 8px 14px;
-            cursor: pointer;
-        }
-        body.light .icon-btn, body.light .menu-btn { color: #1C1B1F; border-color: rgba(28,27,31,0.25); background: rgba(0,0,0,0.05); }
+    .waiting {
+        text-align: center;
+        font-family: 'Space Mono', monospace;
+        font-size: 12px;
+        color: #C9A227;
+        margin-top: 8px;
+        font-weight: 700;
+        letter-spacing: 1px;
+    }
 
-        .dropdown {
-            display: none;
-            position: absolute;
-            top: 42px;
-            left: 0;
-            background: #F5E9D3;
-            padding: 14px;
-            width: 190px;
-            text-align: left;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-        }
-        .dropdown.show { display: block; }
-        .dropdown p {
-            font-family: 'Space Mono', monospace;
-            font-size: 11px;
-            letter-spacing: 2px;
-            color: #C1272D;
-            margin: 10px 0 6px;
-        }
-        .dropdown p:first-child { margin-top: 0; }
-        .dropdown form { margin: 0 0 6px; }
-        .dropdown button {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #1C1B1F;
-            background: transparent;
-            color: #1C1B1F;
-            font-family: 'Space Mono', monospace;
-            font-size: 12px;
-            cursor: pointer;
-        }
-        .dropdown button.active { background: #1C1B1F; color: #F5E9D3; }
+    .battle {
+        font-size: 36px;
+        text-align: center;
+        margin: 14px 0 6px;
+        animation: battleBounce 0.4s cubic-bezier(.17,.67,.83,.67);
+    }
 
-        /* Main ticket card */
-        .ticket {
-            background: #F5E9D3;
-            width: 380px;
-            max-width: 92%;
-            padding: 44px 34px;
-            position: relative;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            animation: slideIn 0.4s ease;
-        }
+    @keyframes battleBounce {
+        0% { transform: scale(0.5); opacity: 0; }
+        60% { transform: scale(1.2); opacity: 1; }
+        100% { transform: scale(1); }
+    }
 
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(16px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+    .choices-made {
+        text-align: center;
+        font-family: 'Space Mono', monospace;
+        font-size: 12px;
+        margin-bottom: 8px;
+    }
+    body.light .choices-made { color: #6b6455; }
+    body.dark .choices-made { color: #A8A090; }
 
-        .ticket::before, .ticket::after {
-            content: "";
-            position: absolute;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-        body.dark .ticket::before, body.dark .ticket::after { background: #1C1B1F; }
-        body.light .ticket::before, body.light .ticket::after { background: #ECE1C8; }
-        .ticket::before { left: -12px; }
-        .ticket::after { right: -12px; }
+    /* Stamped result */
+    .result {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 28px;
+        letter-spacing: 2px;
+        text-align: center;
+        border: 3px solid;
+        display: inline-block;
+        padding: 4px 16px;
+        transform: rotate(-3deg);
+        margin: 10px auto 4px;
+        animation: stamp 0.35s cubic-bezier(.36,1.5,.6,1);
+    }
+    .result-wrap { text-align: center; }
 
-        .eyebrow {
-            font-family: 'Space Mono', monospace;
-            font-size: 11px;
-            letter-spacing: 3px;
-            color: #C1272D;
-            text-align: center;
-        }
+    @keyframes stamp {
+        from { opacity: 0; transform: rotate(-3deg) scale(1.6); }
+        to { opacity: 1; transform: rotate(-3deg) scale(1); }
+    }
 
-        h1 {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 34px;
-            letter-spacing: 2px;
-            text-align: center;
-            color: #1C1B1F;
-            margin: 4px 0 2px;
-        }
+    .result.win { color: #2f7a3d; border-color: #2f7a3d; }
+    .result.lose { color: #C1272D; border-color: #C1272D; }
+    .result.draw { color: #C9A227; border-color: #C9A227; }
 
-        .player-tag {
-            text-align: center;
-            font-family: 'Space Mono', monospace;
-            font-size: 12px;
-            color: #6b6455;
-            margin-bottom: 20px;
-            border-bottom: 1px dashed #c9bb98;
-            padding-bottom: 18px;
-        }
+    .score {
+        font-family: 'Space Mono', monospace;
+        font-size: 12px;
+        text-align: center;
+        border-top: 1px dashed;
+        margin-top: 18px;
+        padding-top: 14px;
+        letter-spacing: 1px;
+    }
+    body.light .score { color: #1C1B1F; border-color: #c9bb98; }
+    body.dark .score { color: #F5E9D3; border-color: #454037; }
 
-        h3 {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 20px;
-            letter-spacing: 1px;
-            text-align: center;
-            color: #1C1B1F;
-            margin-bottom: 16px;
-        }
+    .streak-container {
+        text-align: center;
+        margin-top: 8px;
+    }
 
-        .btn-group {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin: 18px 0;
-        }
+    .final-result { margin-bottom: 8px; }
 
-        button.primary {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 17px;
-            letter-spacing: 1px;
-            padding: 12px 24px;
-            border: none;
-            background: #C1272D;
-            color: #F5E9D3;
-            cursor: pointer;
-            transition: background 0.15s ease;
-        }
-        button.primary:hover { background: #a31f24; }
-        button.primary:active { transform: scale(0.96); }
+    /* Canvas Confetti */
+    #confettiCanvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        pointer-events: none;
+        z-index: 999;
+    }
 
-        /* Ticket-stub choice buttons */
-        .choice-btn {
-            font-size: 26px;
-            padding: 16px 18px;
-            background: transparent;
-            border: 2px dashed #1C1B1F;
-            color: #1C1B1F;
-            cursor: pointer;
-            border-radius: 6px;
-            transition: transform 0.15s ease, background 0.15s ease;
-        }
-        .choice-btn:hover { background: rgba(28,27,31,0.06); transform: translateY(-3px); }
-        .choice-btn:active { transform: scale(0.94); }
+    input.p2-input {
+        width: 100%;
+        padding: 10px;
+        border: none;
+        border-bottom: 2px solid;
+        background: transparent;
+        font-family: 'Space Mono', monospace;
+        font-size: 14px;
+        margin-bottom: 16px;
+        outline: none;
+        text-align: center;
+    }
+    body.light input.p2-input { color: #1C1B1F; border-color: #1C1B1F; }
+    body.dark input.p2-input { color: #F5E9D3; border-color: #F5E9D3; }
+</style>
+{% endblock %}
 
-        .round-info {
-            font-family: 'Space Mono', monospace;
-            font-size: 12px;
-            letter-spacing: 2px;
-            text-align: center;
-            color: #6b6455;
-            margin-bottom: 6px;
-        }
+{% block content %}
+    <canvas id="confettiCanvas"></canvas>
 
-        .waiting {
-            text-align: center;
-            font-family: 'Space Mono', monospace;
-            font-size: 13px;
-            color: #C9A227;
-            margin-top: 8px;
-            font-weight: 700;
-        }
+    <p class="eyebrow">MATCH TICKET ARENA</p>
+    <h1>ROCK · PAPER · SCISSOR</h1>
+    <p class="player-tag">
+        P1: {{ p1_name|upper }} {% if game_mode == "2player" %} | P2: {{ p2_name|upper }}{% endif %}
+    </p>
 
-        .battle {
-            font-size: 34px;
-            text-align: center;
-            margin: 14px 0 6px;
-        }
-
-        .choices-made {
-            text-align: center;
-            font-family: 'Space Mono', monospace;
-            font-size: 12px;
-            color: #6b6455;
-            margin-bottom: 8px;
-        }
-
-        /* Stamped result */
-        .result {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 30px;
-            letter-spacing: 2px;
-            text-align: center;
-            border: 4px solid;
-            display: inline-block;
-            padding: 4px 18px;
-            transform: rotate(-4deg);
-            margin: 10px auto 4px;
-            animation: stamp 0.35s cubic-bezier(.36,1.5,.6,1);
-        }
-        .result-wrap { text-align: center; }
-
-        @keyframes stamp {
-            from { opacity: 0; transform: rotate(-4deg) scale(1.6); }
-            to { opacity: 1; transform: rotate(-4deg) scale(1); }
-        }
-
-        .result.win { color: #2f7a3d; border-color: #2f7a3d; }
-        .result.lose { color: #C1272D; border-color: #C1272D; }
-        .result.draw { color: #C9A227; border-color: #C9A227; }
-
-        .score {
-            font-family: 'Space Mono', monospace;
-            font-size: 13px;
-            text-align: center;
-            color: #1C1B1F;
-            border-top: 1px dashed #c9bb98;
-            margin-top: 20px;
-            padding-top: 14px;
-            letter-spacing: 1px;
-        }
-
-        .final-result { margin-bottom: 8px; }
-    </style>
-</head>
-<body class="{{ theme }}">
-
-    <div class="menu-bar">
-        <button class="menu-btn" onclick="document.getElementById('settingsDropdown').classList.toggle('show')">☰ MENU</button>
-        <div class="dropdown" id="settingsDropdown">
-            <p>GAME MODE</p>
-            <form method="POST"><button name="game_mode" value="computer" class="{{ 'active' if game_mode == 'computer' else '' }}">Vs Computer</button></form>
-            <form method="POST"><button name="game_mode" value="2player" class="{{ 'active' if game_mode == '2player' else '' }}">2 Player</button></form>
-            <p>DIFFICULTY</p>
-            <form method="POST"><button name="difficulty" value="easy" class="{{ 'active' if difficulty == 'easy' else '' }}">Easy</button></form>
-            <form method="POST"><button name="difficulty" value="hard" class="{{ 'active' if difficulty == 'hard' else '' }}">Hard (Smart AI)</button></form>
-        </div>
-    </div>
-
-    <div class="top-bar">
-        <form method="POST">
-            <button class="icon-btn" name="theme" value="{{ 'dark' if theme == 'light' else 'light' }}">
-                {{ 'DARK' if theme == 'light' else 'LIGHT' }}
-            </button>
+    <!-- Mode Selector Controls -->
+    <div class="mode-select-bar">
+        <form method="POST" action="/game" style="display:inline;">
+            <button type="submit" name="game_mode" value="computer" class="mode-btn {{ 'active' if game_mode == 'computer' else '' }}">VS COMPUTER</button>
         </form>
-    </div>
-
-    <div class="ticket">
-        <p class="eyebrow">MATCH TICKET</p>
-        <h1>ROCK · PAPER · SCISSOR</h1>
-        <p class="player-tag">PLAYER: {{ name|upper }}</p>
-
-        {% if game_mode == "2player" and not session.get("p2_name") and not started %}
-            <h3>Enter Player 2's Name</h3>
-            <form method="POST">
-                <input type="text" name="p2name" placeholder="PLAYER 2 NAME" required
-                       style="width:100%; padding:12px; border:none; border-bottom:2px solid #1C1B1F; background:transparent; font-family:'Space Mono',monospace; font-size:14px; margin-bottom:18px; outline:none;">
-                <button class="primary" type="submit">Continue</button>
+        <form method="POST" action="/game" style="display:inline;">
+            <button type="submit" name="game_mode" value="2player" class="mode-btn {{ 'active' if game_mode == '2player' else '' }}">2 PLAYER LOCAL</button>
+        </form>
+        {% if game_mode == 'computer' %}
+            <form method="POST" action="/game" style="display:inline;">
+                <button type="submit" name="difficulty" value="easy" class="mode-btn {{ 'active' if difficulty == 'easy' else '' }}">EASY</button>
             </form>
-        {% elif not started %}
-            <h3>Choose Match Length</h3>
-            <div class="btn-group">
-                <form method="POST"><button class="primary" name="mode" value="3">BEST OF 3</button></form>
-                <form method="POST"><button class="primary" name="mode" value="5">BEST OF 5</button></form>
-            </div>
-        {% elif not match_over %}
-            <p class="round-info">ROUND {{ round + 1 }} / {{ total_rounds }}{% if game_mode == "2player" %} — 2 PLAYER{% endif %}</p>
-
-            {% if waiting_p2 %}
-                <p class="waiting">PLAYER 1 LOCKED IN — PLAYER 2, MAKE YOUR MOVE</p>
-            {% elif game_mode == "2player" %}
-                <p class="waiting">PLAYER 1, MAKE YOUR MOVE</p>
-            {% endif %}
-
-            <form method="POST">
-                <div class="btn-group">
-                    <button class="choice-btn" name="choice" value="rock">🪨</button>
-                    <button class="choice-btn" name="choice" value="paper">📄</button>
-                    <button class="choice-btn" name="choice" value="scissor">✂️</button>
-                </div>
+            <form method="POST" action="/game" style="display:inline;">
+                <button type="submit" name="difficulty" value="hard" class="mode-btn {{ 'active' if difficulty == 'hard' else '' }}">HARD (SMART AI)</button>
             </form>
-
-            {% if result %}
-                <div class="battle">
-                    {% if user_choice == "rock" %}🪨{% elif user_choice == "paper" %}📄{% elif user_choice == "scissor" %}✂️{% endif %}
-                    ⚔️
-                    {% if comp_choice == "rock" %}🪨{% elif comp_choice == "paper" %}📄{% elif comp_choice == "scissor" %}✂️{% endif %}
-                </div>
-                <p class="choices-made">{{ user_choice }} &nbsp;VS&nbsp; {{ comp_choice }}</p>
-                <div class="result-wrap">
-                    <span class="result {% if 'Win' in result %}win{% elif 'Lose' in result %}lose{% else %}draw{% endif %}">{{ result|upper }}</span>
-                </div>
-            {% endif %}
-
-            <p class="score">WINS {{ wins }} — LOSSES {{ losses }} — DRAWS {{ draws }}</p>
-        {% else %}
-            <div class="result-wrap final-result">
-                <span class="result {% if 'won' in match_result %}win{% elif 'lost' in match_result %}lose{% else %}draw{% endif %}">{{ match_result|upper }}</span>
-            </div>
-            <p class="score">FINAL — WINS {{ wins }} — LOSSES {{ losses }} — DRAWS {{ draws }}</p>
-            <div class="btn-group" style="margin-top:18px;">
-                <a href="/reset"><button class="primary">PLAY AGAIN</button></a>
-            </div>
         {% endif %}
     </div>
-</body>
-</html>
+
+    {% set total_played = wins + losses + draws %}
+    {% set win_rate = ((wins / total_played) * 100)|round|int if total_played > 0 else 0 %}
+
+    {% if game_mode == "2player" and not session.get("p2_name") and not started %}
+        <h3>Enter Player 2's Name</h3>
+        <form method="POST" action="/game">
+            <input type="text" name="p2name" class="p2-input" placeholder="PLAYER 2 NAME" required autofocus>
+            <div class="btn-group">
+                <button class="primary" type="submit">CONTINUE</button>
+            </div>
+        </form>
+    {% elif not started %}
+        <h3>Choose Match Length</h3>
+        <div class="btn-group">
+            <form method="POST" action="/game"><button class="primary" name="mode" value="3">BEST OF 3</button></form>
+            <form method="POST" action="/game"><button class="primary" name="mode" value="5">BEST OF 5</button></form>
+        </div>
+    {% elif not match_over %}
+        <p class="round-info">
+            ROUND {{ round + 1 }} / {{ total_rounds }}
+            {% if game_mode == "2player" %} — 2 PLAYER LOCAL{% else %} — VS COMPUTER ({{ difficulty|upper }}){% endif %}
+        </p>
+
+        {% if waiting_p2 %}
+            <p class="waiting">PLAYER 1 CHOICE LOCKED IN — PLAYER 2, MAKE YOUR MOVE</p>
+        {% elif game_mode == "2player" %}
+            <p class="waiting">PLAYER 1, MAKE YOUR MOVE</p>
+        {% endif %}
+
+        <form method="POST" action="/game">
+            <div class="btn-group">
+                <button class="choice-btn" name="choice" value="rock" title="Rock">🪨</button>
+                <button class="choice-btn" name="choice" value="paper" title="Paper">📄</button>
+                <button class="choice-btn" name="choice" value="scissor" title="Scissors">✂️</button>
+            </div>
+        </form>
+
+        {% if result %}
+            <div class="battle">
+                {% if "rock" in user_choice|lower %}🪨{% elif "paper" in user_choice|lower %}📄{% elif "scissor" in user_choice|lower %}✂️{% endif %}
+                ⚔️
+                {% if "rock" in comp_choice|lower %}🪨{% elif "paper" in comp_choice|lower %}📄{% elif "scissor" in comp_choice|lower %}✂️{% endif %}
+            </div>
+            <p class="choices-made">{{ user_choice }} &nbsp;VS&nbsp; {{ comp_choice }}</p>
+            <div class="result-wrap">
+                <span class="result {% if 'Win' in result %}win{% elif 'Lose' in result %}lose{% else %}draw{% endif %}">{{ result|upper }}</span>
+            </div>
+        {% endif %}
+
+        {% if game_mode == "computer" and streak >= 2 %}
+            <div class="streak-container">
+                <div class="streak-badge">
+                    {% if streak >= 7 %}
+                        👑 {{ streak }} WIN STREAK · ARENA LEGEND
+                    {% elif streak >= 4 %}
+                        ⚡ {{ streak }} WIN STREAK · UNSTOPPABLE
+                    {% else %}
+                        🔥 {{ streak }} WIN STREAK · ON FIRE
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+
+        <p class="score">
+            WINS {{ wins }} — LOSSES {{ losses }} — DRAWS {{ draws }} <br>
+            <span style="color:#C1272D; font-size:11px;">({{ win_rate }}% WIN RATE)</span>
+        </p>
+    {% else %}
+        <div class="result-wrap final-result">
+            <span class="result {% if 'won' in match_result %}win{% elif 'lost' in match_result %}lose{% else %}draw{% endif %}">{{ match_result|upper }}</span>
+        </div>
+        
+        {% if game_mode == "computer" and streak >= 2 %}
+            <div class="streak-container">
+                <div class="streak-badge">
+                    {% if streak >= 7 %}
+                        👑 {{ streak }} WIN STREAK · ARENA LEGEND
+                    {% elif streak >= 4 %}
+                        ⚡ {{ streak }} WIN STREAK · UNSTOPPABLE
+                    {% else %}
+                        🔥 {{ streak }} WIN STREAK · ON FIRE
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+
+        <p class="score">
+            FINAL — WINS {{ wins }} — LOSSES {{ losses }} — DRAWS {{ draws }} <br>
+            <span style="color:#C1272D; font-size:11px;">({{ win_rate }}% WIN RATE)</span>
+        </p>
+        <div class="btn-group" style="margin-top:18px;">
+            <a href="/reset" class="btn-primary">PLAY AGAIN</a>
+        </div>
+    {% endif %}
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            {% if match_over and 'won' in match_result %}
+                startConfetti();
+            {% endif %}
+        });
+
+        // Pure JS Canvas Confetti Celebration
+        function startConfetti() {
+            const canvas = document.getElementById('confettiCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const particles = [];
+            const colors = ['#C1272D', '#F5E9D3', '#C9A227', '#2f7a3d', '#1C1B1F'];
+
+            for (let i = 0; i < 75; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    size: Math.random() * 8 + 4,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    vy: Math.random() * 3 + 2,
+                    vx: Math.random() * 2 - 1,
+                    rotation: Math.random() * 360,
+                    rSpeed: Math.random() * 6 - 3
+                });
+            }
+
+            let frames = 0;
+            function render() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => {
+                    p.y += p.vy;
+                    p.x += p.vx;
+                    p.rotation += p.rSpeed;
+
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate((p.rotation * Math.PI) / 180);
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                    ctx.restore();
+                });
+
+                frames++;
+                if (frames < 180) {
+                    requestAnimationFrame(render);
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            }
+
+            render();
+        }
+    </script>
+{% endblock %}

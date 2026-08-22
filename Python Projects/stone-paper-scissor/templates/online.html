@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}Online Lounge · Match Ticket Arena{% endblock %}
+
+{% block extra_css %}
+<style>
+    .online-box {
+        border: 1px dashed;
+        padding: 16px;
+        margin-bottom: 18px;
+        border-radius: 4px;
+        text-align: center;
+    }
+    body.light .online-box { background: rgba(28, 27, 31, 0.04); border-color: #c9bb98; }
+    body.dark .online-box { background: rgba(245, 233, 211, 0.05); border-color: #454037; }
+
+    .online-title {
+        font-family: 'Space Mono', monospace;
+        font-size: 13px;
+        font-weight: 700;
+        color: #C1272D;
+        margin-bottom: 10px;
+        letter-spacing: 1px;
+    }
+
+    input.room-input {
+        width: 100%;
+        max-width: 240px;
+        padding: 10px;
+        border: none;
+        border-bottom: 2px solid;
+        background: transparent;
+        font-family: 'Space Mono', monospace;
+        font-size: 16px;
+        letter-spacing: 3px;
+        margin-bottom: 14px;
+        outline: none;
+        text-align: center;
+        text-transform: uppercase;
+    }
+    body.light input.room-input { color: #1C1B1F; border-color: #1C1B1F; }
+    body.dark input.room-input { color: #F5E9D3; border-color: #F5E9D3; }
+
+    .error-msg {
+        font-family: 'Space Mono', monospace;
+        font-size: 12px;
+        color: #C1272D;
+        margin-bottom: 12px;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .room-badge {
+        font-family: 'Space Mono', monospace;
+        font-size: 12px;
+        background: rgba(193, 39, 45, 0.12);
+        color: #C1272D;
+        border: 1px dashed #C1272D;
+        padding: 4px 8px;
+        border-radius: 4px;
+        display: inline-block;
+        margin: 4px;
+        text-decoration: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <p class="eyebrow">MULTIPLAYER LOUNGE</p>
+    <h1>ONLINE ARENA</h1>
+    <p class="player-tag">HOST OR JOIN A MATCH ROOM</p>
+
+    {% if error %}
+        <p class="error-msg">⚠️ {{ error }}</p>
+    {% endif %}
+
+    <div class="online-box">
+        <div class="online-title">CREATE NEW ROOM</div>
+        <form method="POST" action="/online">
+            <input type="hidden" name="action" value="create">
+            <div style="margin-bottom: 12px;">
+                <label style="font-family:'Space Mono', monospace; font-size:12px; margin-right:10px;">MATCH FORMAT:</label>
+                <select name="total_rounds" style="padding:6px 12px; font-family:'Space Mono', monospace; background:transparent; color:inherit; border:1px solid #C1272D; border-radius:4px; outline:none;">
+                    <option value="3" style="background:#1C1B1F; color:#F5E9D3;">BEST OF 3</option>
+                    <option value="5" style="background:#1C1B1F; color:#F5E9D3;">BEST OF 5</option>
+                </select>
+            </div>
+            <button type="submit" class="primary">GENERATE ROOM TICKET</button>
+        </form>
+    </div>
+
+    <div class="online-box">
+        <div class="online-title">JOIN WITH ROOM CODE</div>
+        <form method="POST" action="/online">
+            <input type="hidden" name="action" value="join">
+            <input type="text" name="room_code" class="room-input" placeholder="e.g. TKT-4" maxlength="10" required autocomplete="off">
+            <div>
+                <button type="submit" class="primary">ENTER ROOM</button>
+            </div>
+        </form>
+    </div>
+
+    {% if active_rooms %}
+        <div class="online-box">
+            <div class="online-title">OPEN ROOMS WAITING</div>
+            <div>
+                {% for code, r in active_rooms.items() %}
+                    {% if not r.p2_name %}
+                        <a href="/room/{{ code }}" class="room-badge">JOIN {{ code }} ({{ r.p1_name }})</a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="btn-group" style="margin-top: 20px;">
+        <a href="/game" class="btn-primary">LOCAL GAME</a>
+    </div>
+{% endblock %}

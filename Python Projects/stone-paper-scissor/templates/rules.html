@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Rules · Match Ticket Arena{% endblock %}
+
+{% block extra_css %}
+<style>
+    .rules-section {
+        margin-top: 10px;
+    }
+
+    .rule-card {
+        border: 1px dashed;
+        padding: 14px 16px;
+        margin-bottom: 14px;
+        border-radius: 4px;
+    }
+    body.light .rule-card { background: rgba(28, 27, 31, 0.04); border-color: #c9bb98; }
+    body.dark .rule-card { background: rgba(245, 233, 211, 0.05); border-color: #454037; }
+
+    .rule-title {
+        font-family: 'Space Mono', monospace;
+        font-size: 13px;
+        font-weight: 700;
+        color: #C1272D;
+        margin-bottom: 6px;
+        letter-spacing: 1px;
+    }
+
+    .rule-body {
+        font-family: 'Inter', sans-serif;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+    body.light .rule-body { color: #1C1B1F; }
+    body.dark .rule-body { color: #F5E9D3; }
+
+    .hand-matrix {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        font-family: 'Space Mono', monospace;
+        font-size: 13px;
+        font-weight: 700;
+        margin: 12px 0 6px;
+    }
+    body.light .hand-matrix { color: #1C1B1F; }
+    body.dark .hand-matrix { color: #F5E9D3; }
+</style>
+{% endblock %}
+
+{% block content %}
+    <p class="eyebrow">OFFICIAL ARENA GUIDE</p>
+    <h1>HOW TO PLAY</h1>
+    <p class="player-tag">RULES & MATCH FORMATS</p>
+
+    <div class="rules-section">
+        <div class="rule-card">
+            <div class="rule-title">CORE WEAPONS & COUNTERS</div>
+            <div class="hand-matrix">
+                <span>🪨 BEATS ✂️</span>
+                <span>✂️ BEATS 📄</span>
+                <span>📄 BEATS 🪨</span>
+            </div>
+            <div class="rule-body" style="text-align: center; margin-top: 6px;">
+                Identical choices result in a Draw.
+            </div>
+        </div>
+
+        <div class="rule-card">
+            <div class="rule-title">MATCH LENGTH</div>
+            <div class="rule-body">
+                Select <strong>Best of 3</strong> or <strong>Best of 5</strong> rounds. First to claim majority rounds wins the match ticket.
+            </div>
+        </div>
+
+        <div class="rule-card">
+            <div class="rule-title">GAME MODES</div>
+            <div class="rule-body">
+                • <strong>Easy AI:</strong> Computer makes completely random moves.<br>
+                • <strong>Hard AI:</strong> Computer analyzes your move history and counter-plays your most frequent selection.<br>
+                • <strong>2-Player Local:</strong> Play turn-by-turn on a single device with hidden choices.<br>
+                • <strong>Online Rooms:</strong> Create or join a room code to battle remotely across devices.
+            </div>
+        </div>
+
+        <div class="rule-card">
+            <div class="rule-title">STREAKS & LEADERBOARD</div>
+            <div class="rule-body">
+                Win consecutive matches vs Computer to unlock streak badges (🔥/⚡/👑). Every finished match is archived in the public leaderboard.
+            </div>
+        </div>
+
+        <div class="btn-group" style="margin-top: 20px;">
+            <a href="/game" class="btn-primary">START PLAYING</a>
+        </div>
+    </div>
+{% endblock %}

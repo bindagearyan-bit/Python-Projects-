@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+
+{% block title %}Leaderboard · Match Ticket Arena{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stats-box {
+        background: rgba(193, 39, 45, 0.08);
+        border: 1px dashed #C1272D;
+        padding: 12px 16px;
+        text-align: center;
+        margin-bottom: 18px;
+        border-radius: 4px;
+    }
+
+    .stats-title {
+        font-family: 'Space Mono', monospace;
+        font-size: 11px;
+        letter-spacing: 2px;
+        color: #C1272D;
+        margin-bottom: 4px;
+        font-weight: 700;
+    }
+
+    .stats-value {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 28px;
+        letter-spacing: 1px;
+    }
+    body.light .stats-value { color: #1C1B1F; }
+    body.dark .stats-value { color: #F5E9D3; }
+
+    /* Heatmap styling */
+    .heatmap-box {
+        border: 1px dashed;
+        padding: 14px 16px;
+        margin-bottom: 18px;
+        border-radius: 4px;
+    }
+    body.light .heatmap-box { background: rgba(28, 27, 31, 0.04); border-color: #c9bb98; }
+    body.dark .heatmap-box { background: rgba(245, 233, 211, 0.05); border-color: #454037; }
+
+    .heatmap-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 6px;
+        margin: 10px 0 6px;
+    }
+
+    .heatmap-cell {
+        aspect-ratio: 1;
+        border-radius: 3px;
+        transition: transform 0.15s ease, opacity 0.15s ease;
+        position: relative;
+        cursor: pointer;
+    }
+    .heatmap-cell:hover {
+        transform: scale(1.15);
+        z-index: 5;
+    }
+
+    /* Heatmap Levels */
+    body.light .lvl-0 { background: #e2d5ba; }
+    body.dark .lvl-0 { background: #35323c; }
+
+    .lvl-1 { background: #fca5a7; }
+    .lvl-2 { background: #e55356; }
+    .lvl-3 { background: #C1272D; }
+    .lvl-4 { background: #7d0d11; }
+
+    .heatmap-legend {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 4px;
+        font-family: 'Space Mono', monospace;
+        font-size: 10px;
+        opacity: 0.7;
+        margin-top: 6px;
+    }
+
+    .legend-box {
+        width: 10px;
+        height: 10px;
+        border-radius: 2px;
+    }
+
+    .leaderboard-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: 'Space Mono', monospace;
+        font-size: 11px;
+        margin-top: 10px;
+    }
+
+    .leaderboard-table th {
+        color: #C1272D;
+        border-bottom: 2px dashed;
+        padding: 8px 6px;
+        text-align: left;
+        letter-spacing: 1px;
+    }
+    body.light .leaderboard-table th { border-color: #1C1B1F; }
+    body.dark .leaderboard-table th { border-color: #F5E9D3; }
+
+    .leaderboard-table td {
+        border-bottom: 1px dashed;
+        padding: 10px 6px;
+    }
+    body.light .leaderboard-table td { color: #1C1B1F; border-color: #c9bb98; }
+    body.dark .leaderboard-table td { color: #F5E9D3; border-color: #454037; }
+
+    .no-data {
+        text-align: center;
+        font-family: 'Space Mono', monospace;
+        font-size: 12px;
+        padding: 20px 0;
+    }
+    body.light .no-data { color: #6b6455; }
+    body.dark .no-data { color: #A8A090; }
+
+    .res-tag {
+        font-weight: 700;
+        padding: 2px 4px;
+        border-radius: 2px;
+    }
+    .res-tag.win { color: #2f7a3d; }
+    .res-tag.lose { color: #C1272D; }
+    .res-tag.draw { color: #C9A227; }
+</style>
+{% endblock %}
+
+{% block content %}
+    <p class="eyebrow">HALL OF FAME</p>
+    <h1>LEADERBOARD</h1>
+    <p class="player-tag">RECENT MATCH RECORDS</p>
+
+    <div class="stats-box">
+        <div class="stats-title">🔥 BEST STREAK EVER</div>
+        <div class="stats-value">{{ best_streak }} WIN{% if best_streak != 1 %}S{% endif %} IN A ROW</div>
+    </div>
+
+    <!-- Commit / Activity Heatmap -->
+    {% if heatmap_days %}
+        <div class="heatmap-box">
+            <div class="stats-title" style="text-align:left;">📊 35-DAY ARENA COMMIT & ACTIVITY HEATMAP</div>
+            <div class="heatmap-grid">
+                {% for day in heatmap_days %}
+                    <div class="heatmap-cell lvl-{{ day.level }}" title="{{ day.date }}: {{ day.count }} match{% if day.count != 1 %}es{% endif %}"></div>
+                {% endfor %}
+            </div>
+            <div class="heatmap-legend">
+                <span>Less</span>
+                <div class="legend-box lvl-0"></div>
+                <div class="legend-box lvl-1"></div>
+                <div class="legend-box lvl-2"></div>
+                <div class="legend-box lvl-3"></div>
+                <div class="legend-box lvl-4"></div>
+                <span>More</span>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if matches %}
+        <div style="overflow-x: auto;">
+            <table class="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th>PLAYER</th>
+                        <th>OPPONENT</th>
+                        <th>RESULT</th>
+                        <th>MODE</th>
+                        <th>DATE</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for m in matches %}
+                        <tr>
+                            <td><strong>{{ m.player }}</strong></td>
+                            <td>{{ m.opponent }}</td>
+                            <td>
+                                <span class="res-tag {% if 'Won' in m.result %}win{% elif 'Lost' in m.result %}lose{% else %}draw{% endif %}">
+                                    {{ m.result }}
+                                </span>
+                            </td>
+                            <td>{{ m.mode }}</td>
+                            <td style="opacity: 0.7; font-size: 10px;">{{ m.date }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="no-data">
+            NO MATCHES RECORDED YET.<br>PLAY A MATCH TO ENTER THE LEADERBOARD!
+        </div>
+    {% endif %}
+
+    <div class="btn-group" style="margin-top: 22px;">
+        <a href="/game" class="btn-primary">PLAY A MATCH</a>
+    </div>
+{% endblock %}

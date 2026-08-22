@@ -1,0 +1,68 @@
+{
+  "matches": [
+    {
+      "player": "aryan",
+      "opponent": "Computer (Easy)",
+      "result": "Draw (1-1)",
+      "mode": "Best of 3",
+      "date": "2026-08-23 00:53"
+    },
+    {
+      "player": "aryan",
+      "opponent": "Computer (Easy)",
+      "result": "Won (1-0)",
+      "mode": "Best of 3",
+      "date": "2026-08-23 00:53"
+    },
+    {
+      "player": "Aryan",
+      "opponent": "Computer (Easy)",
+      "result": "Lost (1-2)",
+      "mode": "Best of 3",
+      "date": "2026-08-23 00:31"
+    },
+    {
+      "player": "Aryan Bindage",
+      "opponent": "Computer (Easy)",
+      "result": "Won (2-1)",
+      "mode": "Best of 3",
+      "date": "2026-08-22 17:04"
+    },
+    {
+      "player": "Aryan Bindage",
+      "opponent": "Computer (Easy)",
+      "result": "Won (2-0)",
+      "mode": "Best of 3",
+      "date": "2026-08-22 16:54"
+    },
+    {
+      "player": "Aryan Bindage",
+      "opponent": "Computer (Easy)",
+      "result": "Won (3-0)",
+      "mode": "Best of 3",
+      "date": "2026-08-22 16:53"
+    },
+    {
+      "player": "Aryan Bindage",
+      "opponent": "Computer (Easy)",
+      "result": "Lost (1-2)",
+      "mode": "Best of 3",
+      "date": "2026-08-22 16:52"
+    },
+    {
+      "player": "Aryan Bindage",
+      "opponent": "Computer (Easy)",
+      "result": "Draw (1-1)",
+      "mode": "Best of 3",
+      "date": "2026-08-22 16:50"
+    },
+    {
+      "player": "Aryan Bindage",
+      "opponent": "Computer (Easy)",
+      "result": "Won (2-0)",
+      "mode": "Best of 3",
+      "date": "2026-08-22 16:49"
+    }
+  ],
+  "best_streak": 7
+}
