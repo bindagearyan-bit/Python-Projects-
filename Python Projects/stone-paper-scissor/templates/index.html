@@ -147,7 +147,7 @@
 {% endblock %}
 
 {% block content %}
-    <canvas id="confettiCanvas"></canvas>
+    <canvas id="confettiCanvas" data-match-won="{{ 'true' if (match_over and match_result and 'won' in match_result) else 'false' }}"></canvas>
 
     <p class="eyebrow">MATCH TICKET ARENA</p>
     <h1>ROCK · PAPER · SCISSOR</h1>
@@ -269,9 +269,9 @@
     {% endif %}
 
     <script>
-        const isMatchWon = Boolean({{ (match_over and match_result and 'won' in match_result) | tojson }});
         document.addEventListener("DOMContentLoaded", function() {
-            if (isMatchWon) {
+            const canvas = document.getElementById("confettiCanvas");
+            if (canvas && canvas.dataset.matchWon === "true") {
                 startConfetti();
             }
         });

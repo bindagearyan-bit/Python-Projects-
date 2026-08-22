@@ -103,7 +103,7 @@
 {% endblock %}
 
 {% block content %}
-    <canvas id="confettiCanvas"></canvas>
+    <canvas id="confettiCanvas" data-should-poll="{{ 'true' if should_poll else 'false' }}" data-room-won="{{ 'true' if (room.match_over and room.match_result and ((is_p1 and 'P1' in room.match_result) or (is_p2 and 'P2' in room.match_result))) else 'false' }}"></canvas>
 
     <div class="room-header">
         <p class="eyebrow">ONLINE MULTIPLAYER ARENA</p>
@@ -189,17 +189,17 @@
 
     <!-- Auto refresh script every 2 seconds when waiting for opponent -->
     <script>
-        const shouldPollRoom = Boolean({{ should_poll | tojson }});
-        const isRoomWon = Boolean({{ (room.match_over and room.match_result and ((is_p1 and 'P1' in room.match_result) or (is_p2 and 'P2' in room.match_result))) | tojson }});
-
-        if (shouldPollRoom) {
-            setTimeout(function() {
-                window.location.reload();
-            }, 2000);
-        }
-
         document.addEventListener("DOMContentLoaded", function() {
-            if (isRoomWon) {
+            const canvas = document.getElementById("confettiCanvas");
+            if (!canvas) return;
+
+            if (canvas.dataset.shouldPoll === "true") {
+                setTimeout(function() {
+                    window.location.reload();
+                }, 2000);
+            }
+
+            if (canvas.dataset.roomWon === "true") {
                 startConfetti();
             }
         });
