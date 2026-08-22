@@ -269,10 +269,11 @@
     {% endif %}
 
     <script>
+        const isMatchWon = Boolean({{ (match_over and match_result and 'won' in match_result) | tojson }});
         document.addEventListener("DOMContentLoaded", function() {
-            {% if match_over and 'won' in match_result %}
+            if (isMatchWon) {
                 startConfetti();
-            {% endif %}
+            }
         });
 
         // Pure JS Canvas Confetti Celebration

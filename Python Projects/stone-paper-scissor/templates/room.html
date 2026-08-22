@@ -189,17 +189,20 @@
 
     <!-- Auto refresh script every 2 seconds when waiting for opponent -->
     <script>
-        {% if should_poll %}
+        const shouldPollRoom = Boolean({{ should_poll | tojson }});
+        const isRoomWon = Boolean({{ (room.match_over and room.match_result and ((is_p1 and 'P1' in room.match_result) or (is_p2 and 'P2' in room.match_result))) | tojson }});
+
+        if (shouldPollRoom) {
             setTimeout(function() {
                 window.location.reload();
             }, 2000);
-        {% endif %}
+        }
 
-        {% if room.match_over and ((is_p1 and 'P1' in room.match_result) or (is_p2 and 'P2' in room.match_result)) %}
-            document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function() {
+            if (isRoomWon) {
                 startConfetti();
-            });
-        {% endif %}
+            }
+        });
 
         function startConfetti() {
             const canvas = document.getElementById('confettiCanvas');
