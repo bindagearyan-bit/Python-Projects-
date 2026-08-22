@@ -1,2 +1,3 @@
-flask
-colorama
+   flask
+   colorama
+   gunicorn
