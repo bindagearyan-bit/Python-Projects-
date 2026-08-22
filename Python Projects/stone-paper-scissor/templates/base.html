@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Rock Paper Scissors · The Fine Print Arena{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 15px;
+            transition: background 0.3s ease;
+        }
+
+        body.dark {
+            background: #1C1B1F;
+            background-image: radial-gradient(circle at 20% 20%, #2A2830 0%, #1C1B1F 60%);
+        }
+
+        body.light {
+            background: #ECE1C8;
+            background-image: radial-gradient(circle at 20% 20%, #F5E9D3 0%, #ECE1C8 60%);
+        }
+
+        /* Top fixed bars */
+        .menu-bar, .top-bar {
+            position: fixed;
+            top: 20px;
+            z-index: 100;
+        }
+        .menu-bar { left: 20px; }
+        .top-bar { right: 20px; }
+
+        .icon-btn, .menu-btn {
+            font-family: 'Space Mono', monospace;
+            font-size: 13px;
+            letter-spacing: 1px;
+            background: rgba(255,255,255,0.1);
+            color: #F5E9D3;
+            border: 1px solid rgba(245,233,211,0.3);
+            padding: 8px 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .icon-btn:hover, .menu-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        body.light .icon-btn, body.light .menu-btn {
+            color: #1C1B1F;
+            border-color: rgba(28,27,31,0.25);
+            background: rgba(0,0,0,0.05);
+        }
+        body.light .icon-btn:hover, body.light .menu-btn:hover {
+            background: rgba(0,0,0,0.1);
+        }
+
+        .dropdown {
+            display: none;
+            position: absolute;
+            top: 42px;
+            left: 0;
+            background: #F5E9D3;
+            padding: 14px;
+            width: 190px;
+            text-align: left;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            border: 1px solid #1C1B1F;
+            z-index: 101;
+        }
+        .dropdown.show { display: block; }
+        .dropdown p {
+            font-family: 'Space Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: #C1272D;
+            margin: 10px 0 6px;
+        }
+        .dropdown p:first-child { margin-top: 0; }
+        .dropdown form { margin: 0 0 6px; }
+        .dropdown button {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #1C1B1F;
+            background: transparent;
+            color: #1C1B1F;
+            font-family: 'Space Mono', monospace;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .dropdown button.active { background: #1C1B1F; color: #F5E9D3; }
+        .dropdown button:hover:not(.active) { background: rgba(28,27,31,0.1); }
+
+        /* Main ticket card */
+        .ticket {
+            background: #F5E9D3;
+            width: 380px;
+            max-width: 92%;
+            padding: 44px 34px;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            animation: slideIn 0.4s ease;
+            border-radius: 4px;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .ticket::before, .ticket::after {
+            content: "";
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
+        }
+        body.dark .ticket::before, body.dark .ticket::after { background: #1C1B1F; }
+        body.light .ticket::before, body.light .ticket::after { background: #ECE1C8; }
+        .ticket::before { left: -12px; }
+        .ticket::after { right: -12px; }
+
+        /* Ticket Header Nav Strip */
+        .nav-strip {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px dashed #c9bb98;
+            padding-bottom: 12px;
+            margin-bottom: 18px;
+            gap: 4px;
+        }
+
+        .nav-strip a {
+            font-family: 'Space Mono', monospace;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #6b6455;
+            text-decoration: none;
+            padding: 4px 8px;
+            border-radius: 3px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-strip a:hover {
+            color: #C1272D;
+            background: rgba(193, 39, 45, 0.08);
+        }
+
+        .nav-strip a.active {
+            color: #F5E9D3;
+            background: #C1272D;
+        }
+
+        .eyebrow {
+            font-family: 'Space Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 3px;
+            color: #C1272D;
+            text-align: center;
+        }
+
+        h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 34px;
+            letter-spacing: 2px;
+            text-align: center;
+            color: #1C1B1F;
+            margin: 4px 0 2px;
+            line-height: 1.1;
+        }
+
+        .player-tag {
+            text-align: center;
+            font-family: 'Space Mono', monospace;
+            font-size: 12px;
+            color: #6b6455;
+            margin-bottom: 20px;
+            border-bottom: 1px dashed #c9bb98;
+            padding-bottom: 16px;
+        }
+
+        h3 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 22px;
+            letter-spacing: 1px;
+            text-align: center;
+            color: #1C1B1F;
+            margin-bottom: 16px;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 18px 0;
+        }
+
+        button.primary, a.btn-primary {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 18px;
+            letter-spacing: 1px;
+            padding: 12px 24px;
+            border: none;
+            background: #C1272D;
+            color: #F5E9D3;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            transition: background 0.15s ease, transform 0.1s ease;
+        }
+        button.primary:hover, a.btn-primary:hover { background: #a31f24; }
+        button.primary:active, a.btn-primary:active { transform: scale(0.96); }
+
+        /* Ticket-stub choice buttons */
+        .choice-btn {
+            font-size: 26px;
+            padding: 16px 18px;
+            background: transparent;
+            border: 2px dashed #1C1B1F;
+            color: #1C1B1F;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: transform 0.15s ease, background 0.15s ease;
+        }
+        .choice-btn:hover { background: rgba(28,27,31,0.06); transform: translateY(-3px); }
+        .choice-btn:active { transform: scale(0.94); }
+
+        /* Streak badge */
+        .streak-badge {
+            font-family: 'Space Mono', monospace;
+            font-size: 12px;
+            font-weight: 700;
+            color: #C1272D;
+            background: rgba(193, 39, 45, 0.12);
+            border: 1px dashed #C1272D;
+            padding: 5px 12px;
+            border-radius: 20px;
+            text-align: center;
+            margin: 10px auto;
+            display: inline-block;
+            animation: pulseStreak 1.8s infinite ease-in-out;
+        }
+
+        @keyframes pulseStreak {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="{{ theme if theme else 'light' }}">
+
+    <div class="menu-bar">
+        <button class="menu-btn" onclick="document.getElementById('settingsDropdown').classList.toggle('show')">☰ MENU</button>
+        <div class="dropdown" id="settingsDropdown">
+            <p>GAME MODE</p>
+            <form method="POST" action="/game"><button name="game_mode" value="computer" class="{{ 'active' if session.get('game_mode') == 'computer' or not session.get('game_mode') else '' }}">Vs Computer</button></form>
+            <form method="POST" action="/game"><button name="game_mode" value="2player" class="{{ 'active' if session.get('game_mode') == '2player' else '' }}">2 Player</button></form>
+            <p>DIFFICULTY</p>
+            <form method="POST" action="/game"><button name="difficulty" value="easy" class="{{ 'active' if session.get('difficulty') == 'easy' or not session.get('difficulty') else '' }}">Easy</button></form>
+            <form method="POST" action="/game"><button name="difficulty" value="hard" class="{{ 'active' if session.get('difficulty') == 'hard' else '' }}">Hard (Smart AI)</button></form>
+        </div>
+    </div>
+
+    <div class="top-bar" style="display: flex; gap: 8px;">
+        <button class="icon-btn" id="soundToggleBtn" onclick="toggleSound()" title="Toggle Sound Effects">🔊 SFX</button>
+        <form method="POST" action="/game" style="margin:0;">
+            <button class="icon-btn" name="theme" value="{{ 'dark' if session.get('theme') == 'light' or not session.get('theme') else 'light' }}">
+                {{ 'DARK' if session.get('theme') == 'light' or not session.get('theme') else 'LIGHT' }}
+            </button>
+        </form>
+    </div>
+
+    <div class="ticket">
+        <nav class="nav-strip">
+            <a href="/game" class="{{ 'active' if active_page == 'game' else '' }}">PLAY</a>
+            <a href="/rules" class="{{ 'active' if active_page == 'rules' else '' }}">RULES</a>
+            <a href="/leaderboard" class="{{ 'active' if active_page == 'leaderboard' else '' }}">LEADERBOARD</a>
+        </nav>
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <script>
+        // Web Audio API Sound Synthesizer
+        let soundEnabled = localStorage.getItem('rps_sound') !== 'disabled';
+        const soundBtn = document.getElementById('soundToggleBtn');
+        if (soundBtn) soundBtn.innerText = soundEnabled ? '🔊 SFX' : '🔇 SFX';
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            localStorage.setItem('rps_sound', soundEnabled ? 'enabled' : 'disabled');
+            if (soundBtn) soundBtn.innerText = soundEnabled ? '🔊 SFX' : '🔇 SFX';
+            if (soundEnabled) playSound('click');
+        }
+
+        let audioCtx = null;
+        function getAudioCtx() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+
+        function playSound(type) {
+            if (!soundEnabled) return;
+            try {
+                const ctx = getAudioCtx();
+                const now = ctx.currentTime;
+                if (type === 'click') {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(450, now);
+                    osc.frequency.exponentialRampToValueAtTime(850, now + 0.06);
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.06);
+                    osc.connect(gain); gain.connect(ctx.destination);
+                    osc.start(now); osc.stop(now + 0.06);
+                } else if (type === 'win') {
+                    [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(freq, now + idx * 0.09);
+                        gain.gain.setValueAtTime(0.18, now + idx * 0.09);
+                        gain.gain.linearRampToValueAtTime(0.01, now + idx * 0.09 + 0.22);
+                        osc.connect(gain); gain.connect(ctx.destination);
+                        osc.start(now + idx * 0.09); osc.stop(now + idx * 0.09 + 0.22);
+                    });
+                } else if (type === 'lose') {
+                    [420, 360, 310, 240].forEach((freq, idx) => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = 'sawtooth';
+                        osc.frequency.setValueAtTime(freq, now + idx * 0.11);
+                        gain.gain.setValueAtTime(0.12, now + idx * 0.11);
+                        gain.gain.linearRampToValueAtTime(0.01, now + idx * 0.11 + 0.18);
+                        osc.connect(gain); gain.connect(ctx.destination);
+                        osc.start(now + idx * 0.11); osc.stop(now + idx * 0.11 + 0.18);
+                    });
+                } else if (type === 'draw') {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(320, now);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
+                    osc.connect(gain); gain.connect(ctx.destination);
+                    osc.start(now); osc.stop(now + 0.25);
+                }
+            } catch(e) {}
+        }
+
+        // Close dropdown when clicking outside
+        window.addEventListener('click', function(e) {
+            const dropdown = document.getElementById('settingsDropdown');
+            const menuBtn = document.querySelector('.menu-btn');
+            if (dropdown && menuBtn && !dropdown.contains(e.target) && !menuBtn.contains(e.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html>
