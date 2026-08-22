@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Leaderboard · Rock Paper Scissors{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stats-box {
+        background: rgba(193, 39, 45, 0.08);
+        border: 1px dashed #C1272D;
+        padding: 12px 16px;
+        text-align: center;
+        margin-bottom: 18px;
+        border-radius: 4px;
+    }
+
+    .stats-title {
+        font-family: 'Space Mono', monospace;
+        font-size: 11px;
+        letter-spacing: 2px;
+        color: #C1272D;
+        margin-bottom: 4px;
+    }
+
+    .stats-value {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 28px;
+        color: #1C1B1F;
+        letter-spacing: 1px;
+    }
+
+    .leaderboard-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: 'Space Mono', monospace;
+        font-size: 11px;
+        margin-top: 10px;
+    }
+
+    .leaderboard-table th {
+        color: #C1272D;
+        border-bottom: 2px dashed #1C1B1F;
+        padding: 8px 6px;
+        text-align: left;
+        letter-spacing: 1px;
+    }
+
+    .leaderboard-table td {
+        color: #1C1B1F;
+        border-bottom: 1px dashed #c9bb98;
+        padding: 10px 6px;
+    }
+
+    .no-data {
+        text-align: center;
+        font-family: 'Space Mono', monospace;
+        font-size: 12px;
+        color: #6b6455;
+        padding: 20px 0;
+    }
+
+    .res-tag {
+        font-weight: 700;
+        padding: 2px 4px;
+        border-radius: 2px;
+    }
+    .res-tag.win { color: #2f7a3d; }
+    .res-tag.lose { color: #C1272D; }
+    .res-tag.draw { color: #C9A227; }
+</style>
+{% endblock %}
+
+{% block content %}
+    <p class="eyebrow">HALL OF FAME</p>
+    <h1>LEADERBOARD</h1>
+    <p class="player-tag">RECENT MATCH RECORDS</p>
+
+    <div class="stats-box">
+        <div class="stats-title">🔥 BEST STREAK EVER</div>
+        <div class="stats-value">{{ best_streak }} WIN{% if best_streak != 1 %}S{% endif %} IN A ROW</div>
+    </div>
+
+    {% if matches %}
+        <div style="overflow-x: auto;">
+            <table class="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th>PLAYER</th>
+                        <th>OPPONENT</th>
+                        <th>RESULT</th>
+                        <th>MODE</th>
+                        <th>DATE</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for m in matches %}
+                        <tr>
+                            <td><strong>{{ m.player }}</strong></td>
+                            <td>{{ m.opponent }}</td>
+                            <td>
+                                <span class="res-tag {% if 'Won' in m.result %}win{% elif 'Lost' in m.result %}lose{% else %}draw{% endif %}">
+                                    {{ m.result }}
+                                </span>
+                            </td>
+                            <td>{{ m.mode }}</td>
+                            <td style="color: #6b6455; font-size: 10px;">{{ m.date }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="no-data">
+            NO MATCHES RECORDED YET.<br>PLAY A MATCH TO ENTER THE LEADERBOARD!
+        </div>
+    {% endif %}
+
+    <div class="btn-group" style="margin-top: 22px;">
+        <a href="/game" class="btn-primary" onclick="playSound('click')">PLAY A MATCH</a>
+    </div>
+{% endblock %}
