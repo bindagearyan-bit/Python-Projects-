@@ -1,56 +1,110 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Login - Rock Paper Scissors</title>
+    <title>Rock Paper Scissors</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            text-align: center;
-            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            font-family: 'Inter', sans-serif;
+            background: #1C1B1F;
+            background-image: radial-gradient(circle at 20% 20%, #2A2830 0%, #1C1B1F 60%);
             min-height: 100vh;
-            margin: 0;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        .login-box {
-            background: white;
-            border-radius: 20px;
-            padding: 40px 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            max-width: 360px;
-            width: 90%;
+
+        .ticket {
+            background: #F5E9D3;
+            width: 340px;
+            padding: 40px 32px;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border-radius: 4px;
         }
-        h1 { color: #2c2c54; margin-bottom: 20px; }
+
+        .ticket::before, .ticket::after {
+            content: "";
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background: #1C1B1F;
+            border-radius: 50%;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .ticket::before { left: -12px; }
+        .ticket::after { right: -12px; }
+
+        .eyebrow {
+            font-family: 'Space Mono', monospace;
+            font-size: 12px;
+            letter-spacing: 3px;
+            color: #C1272D;
+            text-align: center;
+            margin-bottom: 6px;
+        }
+
+        h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 42px;
+            letter-spacing: 2px;
+            text-align: center;
+            color: #1C1B1F;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .sub {
+            text-align: center;
+            font-size: 13px;
+            color: #6b6455;
+            margin-bottom: 28px;
+        }
+
         input {
             width: 100%;
-            padding: 12px;
-            border-radius: 10px;
-            border: 1px solid #ccc;
-            font-size: 16px;
-            margin-bottom: 15px;
+            padding: 14px;
+            border: none;
+            border-bottom: 2px solid #1C1B1F;
+            background: transparent;
+            font-family: 'Space Mono', monospace;
+            font-size: 15px;
+            color: #1C1B1F;
+            margin-bottom: 24px;
+            outline: none;
         }
+
+        input::placeholder { color: #9a9284; }
+
         button {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             border: none;
-            border-radius: 10px;
-            background: #2575fc;
-            color: white;
-            font-size: 16px;
-            font-weight: 600;
+            background: #C1272D;
+            color: #F5E9D3;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 20px;
+            letter-spacing: 2px;
             cursor: pointer;
+            transition: background 0.15s ease;
         }
-        button:hover { background: #1a5edb; }
+
+        button:hover { background: #a31f24; }
+        button:active { transform: scale(0.98); }
     </style>
 </head>
 <body>
-    <div class="login-box">
-        <h1>🪨📄✂️ Welcome</h1>
+    <div class="ticket">
+        <p class="eyebrow">ADMIT ONE</p>
+        <h1>ROCK · PAPER · SCISSOR</h1>
+        <p class="sub">Enter your name to take the floor</p>
         <form method="POST">
-            <input type="text" name="name" placeholder="Enter your name" required>
-            <button type="submit">Start Playing</button>
+            <input type="text" name="name" placeholder="YOUR NAME" required>
+            <button type="submit">Enter the Arena</button>
         </form>
     </div>
 </body>
