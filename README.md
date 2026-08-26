@@ -1,103 +1,92 @@
-# 🪨📄✂️ Rock Paper Scissors Game
+# 🪨📄✂️ Rock Paper Scissor — Match Ticket Arena
 
-A Rock Paper Scissors game built in Python — playable in the terminal or as a full-featured web app using Flask.
+A full-featured Rock Paper Scissors web app built with Python + Flask, styled as a vintage "Match Ticket" — now live and packaged as an installable Android APK.
+
+**Live app:** https://python-projects-p41c.onrender.com
 
 _Last updated: August 2026_
 
 ## 📌 About
 
-This project started as a simple command-line Rock Paper Scissors game and has grown into a complete web app with login, game modes, difficulty levels, dark/light theme, and animations.
+What started as a simple terminal script has grown into a complete web application with login, multiple game modes, a smart AI opponent, online multiplayer, a leaderboard, and a custom vintage ticket-stub visual theme — deployed live and shareable as an Android app.
 
 ## 🚀 Features
 
-- Play Rock, Paper, or Scissors against the computer
-- Choose input mode (terminal version): words (`rock`, `paper`, `scissor`) or numbers (`0`, `1`, `2`)
-- Choose match mode: **Best of 3** or **Best of 5**
-- Live score tracking (wins / losses / draws) throughout the match
-- Final match result summary (win, lose, or draw the overall match)
-- Colored terminal output using `colorama` (green for win, red for loss, cyan for draw)
-- Web-based version using Flask, with clickable buttons instead of typing
-- Simple login screen (enter your name to start playing)
-- **2 Player mode** — play against a friend on the same device, with both player names shown
-- **Difficulty mode** (vs Computer): Easy (random) or Hard (computer tracks your most common move and counters it)
-- **Dark mode / Light mode** toggle
-- Menu bar to switch game mode and difficulty mid-session
-- Animated UI: fade-ins, button pop effects, and a "battle" emoji clash animation on each round
+- **Login** — simple name entry to personalize the session
+- **Vs Computer mode** with two difficulty levels:
+  - Easy — random moves
+  - Hard — tracks your move history and counters your most common choice
+- **Local 2-Player mode** — two players share one device, taking turns
+- **Online Multiplayer** — create or join a 5-character room code and play against a friend on a separate device, anywhere
+- **Best of 3 / Best of 5** match length selection
+- **Win streak tracker** — 🔥 badge shown after 2+ consecutive wins (vs Computer)
+- **Match Leaderboard** — last 10 matches saved and displayed (player, opponent, result, mode, date)
+- **Dark mode / Light mode** toggle, fully re-themed (not just background)
+- **Rules and About pages**, all styled consistently
+- Custom **Match Ticket** visual theme: parchment ticket card, punch-hole cutouts, Bebas Neue headings, Space Mono scoreboard text, crimson red accents
+- Packaged as an **installable Android APK** via PWA Builder — shareable directly with friends, no Play Store needed
 
 ## 🛠️ Tech Stack
 
 - Python 3
-- Flask (for the web version)
-- colorama (for colored terminal output)
+- Flask
+- Jinja2 templates
+- JSON file storage (leaderboard, no database needed)
+- Deployed on Render
+- Packaged with PWABuilder (PWA → APK)
 
 ## 📁 Project Structure
 
 ```
-rps-project/
-├── rps_terminal.py     # Core game logic + terminal version
-├── app.py              # Flask web app (reuses logic from rps_terminal.py)
-├── requirements.txt    # Python dependencies
-├── .gitignore
+stone-paper-scissor/
+├── app.py                  # Main Flask app — all routes and game logic
+├── rps_terminal.py         # Original terminal version
+├── requirements.txt        # Python dependencies (flask, gunicorn, colorama)
+├── leaderboard.json        # Stored match history
+├── static/
+│   ├── manifest.json       # PWA manifest (for APK packaging)
+│   ├── icon-192.png
+│   └── icon-512.png
 └── templates/
-    ├── login.html      # Name entry screen
-    └── index.html      # Main game UI
+    ├── base.html            # Shared layout (nav, head, manifest link)
+    ├── login.html
+    ├── index.html           # Main game screen
+    ├── rules.html
+    ├── about.html
+    ├── leaderboard.html
+    ├── online.html          # Create/Join online room
+    └── room.html            # Live online match screen
 ```
 
-## ▶️ How to Run
+## ▶️ How to Run Locally
 
-### Terminal version
 ```bash
 git clone <your-repo-link>
-cd <your-repo-folder>
-python rps_terminal.py
+cd stone-paper-scissor
+pip install -r requirements.txt
+python app.py
 ```
-Follow the prompts to choose your input mode (words/numbers) and match mode (Best of 3/5).
+Open `http://127.0.0.1:5000` in your browser.
 
-### Web version
-1. Install dependencies
-   ```bash
-   pip install -r requirements.txt
-   ```
-2. Run the app
-   ```bash
-   python app.py
-   ```
-3. Open your browser at `http://127.0.0.1:5000`
-4. Enter your name, pick a game mode (Vs Computer / 2 Player) and difficulty from the menu, then play
+## 🌐 Play Online
 
-## 🎮 Example (Terminal)
+Visit the live deployed version:
+**https://python-projects-p41c.onrender.com**
 
-```
-Choose input mode:
-1. Words (rock, paper, scissor)
-2. Numbers (0, 1, 2)
-Enter 1 or 2: 1
+## 📱 Install as an App (Android)
 
-Choose mode:
-1. Best of 3
-2. Best of 5
-Enter 1 or 2: 1
+An APK is available for direct install — no Play Store required:
+1. Download `RPS Arena.apk`
+2. On your Android phone, tap the file
+3. Allow "install from unknown sources" if prompted
+4. Open "RPS Arena" from your home screen
 
---- Round 1 ---
-Type rock, paper, or scissor: paper
-You : Paper
-Computer : Rock
-You Win!
+## 🗺️ Roadmap / Ideas for Later
 
---- Final Score ---
-Wins   : 2
-Losses : 1
-Draws  : 0
-You won the match! 🎉
-```
-
-## 🗺️ Roadmap / Upcoming Features
-
+- [ ] Service worker for offline support
+- [ ] App screenshots for a future Play Store listing
 - [ ] Rock Paper Scissors Lizard Spock variant
-- [ ] "Computer is choosing..." animation delay
 - [ ] Unit tests using `pytest`
-- [ ] Deploy the web version live (Render / PythonAnywhere)
-- [ ] Package as an installable APK to share with friends
 
 ## 🤝 Contributing
 
