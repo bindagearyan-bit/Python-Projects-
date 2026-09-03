@@ -3,18 +3,35 @@
 <head>
     <title>To-Do List</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 500px; margin: 50px auto; }
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; }
         h1 { text-align: center; margin-bottom: 4px; }
-        .counter { text-align: center; color: #666; margin-bottom: 20px; font-size: 14px; }
-        .task-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #ddd; }
-        .task-text { flex: 1; }
-        .completed { text-decoration: line-through; color: #888; }
-        form.add-form { display: flex; gap: 8px; margin-bottom: 20px; }
-        input[type="text"] { flex: 1; padding: 8px; }
+        .counter { text-align: center; color: #666; margin-bottom: 16px; font-size: 14px; }
+
+        .controls { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+        .controls a, .controls select {
+            font-size: 13px; padding: 6px 10px; border-radius: 6px; text-decoration: none;
+            border: 1px solid #ccc; color: #333; background: #f4f4f4;
+        }
+        .controls a.active { background: #2575fc; color: white; border-color: #2575fc; }
+
+        .add-form { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+        .add-form input[type="text"] { flex: 2; padding: 8px; min-width: 140px; }
+        .add-form select, .add-form input[type="date"] { padding: 8px; }
         button { padding: 8px 12px; cursor: pointer; }
+
+        .task-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #ddd; }
+        .task-main { flex: 1; }
+        .task-text { display: block; }
+        .completed { text-decoration: line-through; color: #888; }
+        .task-meta { font-size: 12px; color: #777; margin-top: 2px; display: flex; gap: 8px; }
+
+        .priority-High { color: #C1272D; font-weight: 600; }
+        .priority-Medium { color: #C9A227; font-weight: 600; }
+        .priority-Low { color: #2f7a3d; font-weight: 600; }
+
         .empty-state { text-align: center; color: #999; margin-top: 30px; }
-        .edit-form { display: flex; gap: 6px; flex: 1; }
-        .edit-form input { flex: 1; padding: 4px; }
+        .edit-form { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; }
+        .edit-form input, .edit-form select { padding: 4px; }
         .icon-link { text-decoration: none; cursor: pointer; }
     </style>
 </head>
@@ -22,11 +39,26 @@
     <h1>📝 To-Do List</h1>
     <p class="counter">
         {% set remaining = tasks|selectattr("completed", "equalto", false)|list|length %}
-        {{ remaining }} task{{ 's' if remaining != 1 else '' }} remaining · {{ tasks|length }} total
+        {{ remaining }} remaining · {{ all_tasks_count }} total
     </p>
+
+    <div class="controls">
+        <a href="/?filter=all&sort={{ sort_by }}" class="{{ 'active' if filter_by == 'all' }}">All</a>
+        <a href="/?filter=active&sort={{ sort_by }}" class="{{ 'active' if filter_by == 'active' }}">Active</a>
+        <a href="/?filter=completed&sort={{ sort_by }}" class="{{ 'active' if filter_by == 'completed' }}">Completed</a>
+        <a href="/?filter={{ filter_by }}&sort=priority" class="{{ 'active' if sort_by == 'priority' }}">Sort: Priority</a>
+        <a href="/?filter={{ filter_by }}&sort=due_date" class="{{ 'active' if sort_by == 'due_date' }}">Sort: Due Date</a>
+    </div>
 
     <form class="add-form" method="POST" action="/add">
         <input type="text" name="task" placeholder="Add a new task..." required>
+        <input type="text" name="category" placeholder="Category">
+        <select name="priority">
+            <option value="High">High</option>
+            <option value="Medium" selected>Medium</option>
+            <option value="Low">Low</option>
+        </select>
+        <input type="date" name="due_date">
         <button type="submit">Add</button>
     </form>
 
@@ -37,11 +69,25 @@
         {% if task.id == edit_id %}
             <form class="edit-form" method="POST" action="/edit/{{ task.id }}">
                 <input type="text" name="new_text" value="{{ task.text }}" required autofocus>
+                <input type="text" name="new_category" value="{{ task.category }}">
+                <select name="new_priority">
+                    <option value="High" {% if task.priority == "High" %}selected{% endif %}>High</option>
+                    <option value="Medium" {% if task.priority == "Medium" %}selected{% endif %}>Medium</option>
+                    <option value="Low" {% if task.priority == "Low" %}selected{% endif %}>Low</option>
+                </select>
+                <input type="date" name="new_due_date" value="{{ task.due_date }}">
                 <button type="submit">Save</button>
                 <a class="icon-link" href="/">✖</a>
             </form>
         {% else %}
-            <span class="task-text {% if task.completed %}completed{% endif %}">{{ task.text }}</span>
+            <div class="task-main">
+                <span class="task-text {% if task.completed %}completed{% endif %}">{{ task.text }}</span>
+                <div class="task-meta">
+                    <span>📁 {{ task.category }}</span>
+                    <span class="priority-{{ task.priority }}">● {{ task.priority }}</span>
+                    {% if task.due_date %}<span>📅 {{ task.due_date }}</span>{% endif %}
+                </div>
+            </div>
             <a class="icon-link" href="/?edit={{ task.id }}">✏️</a>
             <a class="icon-link" href="/delete/{{ task.id }}">🗑️</a>
         {% endif %}
