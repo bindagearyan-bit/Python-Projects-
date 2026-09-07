@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sign Up - To-Do List</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 360px; margin: 100px auto; text-align: center; }
+        input { width: 100%; padding: 10px; margin-bottom: 12px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; cursor: pointer; }
+        .error { color: #C1272D; font-size: 14px; margin-bottom: 12px; }
+    </style>
+</head>
+<body>
+    <h1>📝 Sign Up</h1>
+    {% if error %}<p class="error">{{ error }}</p>{% endif %}
+    <form method="POST">
+        <input type="text" name="username" placeholder="Choose a username" required>
+        <input type="password" name="password" placeholder="Choose a password" required>
+        <button type="submit">Sign Up</button>
+    </form>
+    <p>Already have an account? <a href="/login">Login</a></p>
+</body>
+</html>
