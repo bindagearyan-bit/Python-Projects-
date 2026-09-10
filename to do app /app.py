@@ -160,5 +160,12 @@ def clear_completed():
     return redirect("/")
 
 
+@app.route("/toggle_theme")
+def toggle_theme():
+    current = session.get("theme", "light")
+    session["theme"] = "dark" if current == "light" else "light"
+    return redirect(request.referrer or "/")
+
+
 if __name__ == "__main__":
     app.run(debug=True)
