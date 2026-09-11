@@ -3,11 +3,14 @@
 <head>
     <title>To-Do List</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; }
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; transition: background 0.2s ease, color 0.2s ease; }
+        body.dark { background: #1C1B1F; color: #F5E9D3; }
         h1 { text-align: center; margin-bottom: 4px; }
         .counter { text-align: center; color: #666; margin-bottom: 10px; font-size: 14px; }
+        body.dark .counter { color: #b5ada0; }
 
         .progress-wrap { background: #eee; border-radius: 8px; height: 10px; margin-bottom: 20px; overflow: hidden; }
+        body.dark .progress-wrap { background: #333; }
         .progress-bar { background: #2f7a3d; height: 100%; transition: width 0.3s ease; }
 
         .search-row { display: flex; gap: 8px; margin-bottom: 14px; }
@@ -18,19 +21,23 @@
             font-size: 13px; padding: 6px 10px; border-radius: 6px; text-decoration: none;
             border: 1px solid #ccc; color: #333; background: #f4f4f4;
         }
+        body.dark .controls a, body.dark .controls select { background: #2A2830; color: #F5E9D3; border-color: #444; }
         .controls a.active { background: #2575fc; color: white; border-color: #2575fc; }
         .controls a.danger { background: #fdecea; color: #C1272D; border-color: #f3c6c2; }
 
         .add-form { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
         .add-form input[type="text"] { flex: 2; padding: 8px; min-width: 140px; }
         .add-form select, .add-form input[type="date"] { padding: 8px; }
+        body.dark .add-form input, body.dark .add-form select { background: #2A2830; color: #F5E9D3; border-color: #444; }
         button { padding: 8px 12px; cursor: pointer; }
 
         .task-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #ddd; }
+        body.dark .task-row { border-color: #444; }
         .task-main { flex: 1; }
         .task-text { display: block; }
         .completed { text-decoration: line-through; color: #888; }
-        .task-meta { font-size: 12px; color: #777; margin-top: 2px; display: flex; gap: 8px; }
+        .task-meta { font-size: 12px; color: #777; margin-top: 2px; display: flex; gap: 8px; flex-wrap: wrap; }
+        body.dark .task-meta { color: #aaa; }
 
         .priority-High { color: #C1272D; font-weight: 600; }
         .priority-Medium { color: #C9A227; font-weight: 600; }
@@ -40,9 +47,17 @@
         .edit-form { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; }
         .edit-form input, .edit-form select { padding: 4px; }
         .icon-link { text-decoration: none; cursor: pointer; }
+
+        .top-bar { text-align: right; font-size: 13px; margin-bottom: 10px; }
+        .top-bar a { color: inherit; }
     </style>
 </head>
-<body>
+<body class="{{ theme }}">
+    <p class="top-bar">
+        <a href="/toggle_theme">{{ '🌙 Dark Mode' if theme == 'light' else '☀️ Light Mode' }}</a>
+        &nbsp;|&nbsp; Logged in as <b>{{ username }}</b> — <a href="/logout">Logout</a>
+    </p>
+
     <h1>📝 To-Do List</h1>
     <p class="counter">
         {{ completed_count }}/{{ all_tasks_count }} tasks completed ({{ progress_pct }}%)
@@ -76,6 +91,11 @@
             <option value="Low">Low</option>
         </select>
         <input type="date" name="due_date">
+        <select name="recurrence">
+            <option value="none" selected>No repeat</option>
+            <option value="daily">Repeat Daily</option>
+            <option value="weekly">Repeat Weekly</option>
+        </select>
         <button type="submit">Add</button>
     </form>
 
@@ -103,6 +123,9 @@
                     <span>📁 {{ task.category }}</span>
                     <span class="priority-{{ task.priority }}">● {{ task.priority }}</span>
                     {% if task.due_date %}<span>📅 {{ task.due_date }}</span>{% endif %}
+                    {% if task.recurrence and task.recurrence != "none" %}
+                        <span>🔁 {{ task.recurrence|capitalize }}</span>
+                    {% endif %}
                 </div>
             </div>
             <a class="icon-link" href="/?edit={{ task.id }}">✏️</a>
