@@ -62,6 +62,15 @@ def logout():
     return redirect("/login")
 
 
+# ---------- Theme ----------
+
+@app.route("/toggle_theme")
+def toggle_theme():
+    current = session.get("theme", "light")
+    session["theme"] = "dark" if current == "light" else "light"
+    return redirect(request.referrer or "/")
+
+
 # ---------- Main App ----------
 
 @app.route("/")
@@ -91,7 +100,8 @@ def home():
         all_tasks_count=all_tasks_count,
         completed_count=completed_count,
         progress_pct=progress_pct,
-        username=session.get("username")
+        username=session.get("username"),
+        theme=session.get("theme", "light")
     )
 
 
@@ -122,15 +132,25 @@ def add_task():
     category = request.form.get("category", "General").strip() or "General"
     priority = request.form.get("priority", "Medium")
     due_date = request.form.get("due_date", "")
+    recurrence = request.form.get("recurrence", "none")
 
     if task_text and not db.task_exists(session["user_id"], task_text):
-        db.insert_task(session["user_id"], task_text, category, priority, due_date)
+        db.insert_task(session["user_id"], task_text, category, priority, due_date, recurrence)
 
     return redirect("/")
 
 
 @app.route("/complete/<int:task_id>")
 def complete_task(task_id):
+    task = db.get_task_by_id(session["user_id"], task_id)
+
+    if task and not task["completed"] and task.get("recurrence", "none") != "none":
+        next_due = db.calculate_next_due_date(task["due_date"], task["recurrence"])
+        db.insert_task(
+            session["user_id"], task["text"], task["category"],
+            task["priority"], next_due, task["recurrence"]
+        )
+
     db.toggle_task_complete(session["user_id"], task_id)
     return redirect("/")
 
@@ -158,13 +178,6 @@ def edit_task(task_id):
 def clear_completed():
     db.delete_completed_tasks(session["user_id"])
     return redirect("/")
-
-
-@app.route("/toggle_theme")
-def toggle_theme():
-    current = session.get("theme", "light")
-    session["theme"] = "dark" if current == "light" else "light"
-    return redirect(request.referrer or "/")
 
 
 if __name__ == "__main__":
