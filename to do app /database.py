@@ -1,4 +1,5 @@
 import sqlite3
+from datetime import datetime, timedelta
 
 DB_FILE = "todo.db"
 
@@ -29,6 +30,7 @@ def init_db():
             priority TEXT DEFAULT 'Medium',
             due_date TEXT DEFAULT '',
             completed INTEGER DEFAULT 0,
+            recurrence TEXT DEFAULT 'none',
             FOREIGN KEY (user_id) REFERENCES users (id)
         )
     """)
@@ -45,6 +47,13 @@ def get_tasks_for_user(user_id):
     return [dict(row) for row in rows]
 
 
+def get_task_by_id(user_id, task_id):
+    conn = get_connection()
+    row = conn.execute("SELECT * FROM tasks WHERE id = ? AND user_id = ?", (task_id, user_id)).fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+
 def task_exists(user_id, text):
     conn = get_connection()
     row = conn.execute(
@@ -55,11 +64,11 @@ def task_exists(user_id, text):
     return row is not None
 
 
-def insert_task(user_id, text, category, priority, due_date):
+def insert_task(user_id, text, category, priority, due_date, recurrence="none"):
     conn = get_connection()
     conn.execute(
-        "INSERT INTO tasks (user_id, text, category, priority, due_date) VALUES (?, ?, ?, ?, ?)",
-        (user_id, text, category, priority, due_date)
+        "INSERT INTO tasks (user_id, text, category, priority, due_date, recurrence) VALUES (?, ?, ?, ?, ?, ?)",
+        (user_id, text, category, priority, due_date, recurrence)
     )
     conn.commit()
     conn.close()
@@ -97,6 +106,26 @@ def delete_completed_tasks(user_id):
     conn.execute("DELETE FROM tasks WHERE user_id = ? AND completed = 1", (user_id,))
     conn.commit()
     conn.close()
+
+
+def calculate_next_due_date(current_due_date, recurrence):
+    """Given a due date and a recurrence type, return the next due date string."""
+    if not current_due_date:
+        base_date = datetime.now()
+    else:
+        try:
+            base_date = datetime.strptime(current_due_date, "%Y-%m-%d")
+        except ValueError:
+            base_date = datetime.now()
+
+    if recurrence == "daily":
+        next_date = base_date + timedelta(days=1)
+    elif recurrence == "weekly":
+        next_date = base_date + timedelta(weeks=1)
+    else:
+        return current_due_date
+
+    return next_date.strftime("%Y-%m-%d")
 
 
 # ---------- User queries ----------
