@@ -31,8 +31,9 @@
         body.dark .add-form input, body.dark .add-form select { background: #2A2830; color: #F5E9D3; border-color: #444; }
         button { padding: 8px 12px; cursor: pointer; }
 
-        .task-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #ddd; }
-        body.dark .task-row { border-color: #444; }
+        .task-block { border-bottom: 1px solid #ddd; padding: 10px 0; }
+        body.dark .task-block { border-color: #444; }
+        .task-row { display: flex; align-items: center; gap: 10px; }
         .task-main { flex: 1; }
         .task-text { display: block; }
         .completed { text-decoration: line-through; color: #888; }
@@ -50,6 +51,15 @@
 
         .top-bar { text-align: right; font-size: 13px; margin-bottom: 10px; }
         .top-bar a { color: inherit; }
+
+        .subtask-list { margin: 8px 0 4px 30px; padding: 0; }
+        .subtask-row { display: flex; align-items: center; gap: 8px; font-size: 13px; padding: 3px 0; }
+        .subtask-row.done span { text-decoration: line-through; color: #999; }
+        .subtask-add-form { display: flex; gap: 6px; margin: 6px 0 0 30px; }
+        .subtask-add-form input { flex: 1; padding: 4px 6px; font-size: 12px; }
+        .subtask-add-form button { padding: 4px 8px; font-size: 12px; }
+        .subtask-progress { font-size: 11px; color: #888; margin-left: 30px; }
+        body.dark .subtask-progress { color: #999; }
     </style>
 </head>
 <body class="{{ theme }}">
@@ -100,37 +110,58 @@
     </form>
 
     {% for task in tasks %}
-    <div class="task-row">
-        <input type="checkbox" onclick="window.location.href='/complete/{{ task.id }}'" {% if task.completed %}checked{% endif %}>
+    <div class="task-block">
+        <div class="task-row">
+            <input type="checkbox" onclick="window.location.href='/complete/{{ task.id }}'" {% if task.completed %}checked{% endif %}>
 
-        {% if task.id == edit_id %}
-            <form class="edit-form" method="POST" action="/edit/{{ task.id }}">
-                <input type="text" name="new_text" value="{{ task.text }}" required autofocus>
-                <input type="text" name="new_category" value="{{ task.category }}">
-                <select name="new_priority">
-                    <option value="High" {% if task.priority == "High" %}selected{% endif %}>High</option>
-                    <option value="Medium" {% if task.priority == "Medium" %}selected{% endif %}>Medium</option>
-                    <option value="Low" {% if task.priority == "Low" %}selected{% endif %}>Low</option>
-                </select>
-                <input type="date" name="new_due_date" value="{{ task.due_date }}">
-                <button type="submit">Save</button>
-                <a class="icon-link" href="/">✖</a>
-            </form>
-        {% else %}
-            <div class="task-main">
-                <span class="task-text {% if task.completed %}completed{% endif %}">{{ task.text }}</span>
-                <div class="task-meta">
-                    <span>📁 {{ task.category }}</span>
-                    <span class="priority-{{ task.priority }}">● {{ task.priority }}</span>
-                    {% if task.due_date %}<span>📅 {{ task.due_date }}</span>{% endif %}
-                    {% if task.recurrence and task.recurrence != "none" %}
-                        <span>🔁 {{ task.recurrence|capitalize }}</span>
-                    {% endif %}
+            {% if task.id == edit_id %}
+                <form class="edit-form" method="POST" action="/edit/{{ task.id }}">
+                    <input type="text" name="new_text" value="{{ task.text }}" required autofocus>
+                    <input type="text" name="new_category" value="{{ task.category }}">
+                    <select name="new_priority">
+                        <option value="High" {% if task.priority == "High" %}selected{% endif %}>High</option>
+                        <option value="Medium" {% if task.priority == "Medium" %}selected{% endif %}>Medium</option>
+                        <option value="Low" {% if task.priority == "Low" %}selected{% endif %}>Low</option>
+                    </select>
+                    <input type="date" name="new_due_date" value="{{ task.due_date }}">
+                    <button type="submit">Save</button>
+                    <a class="icon-link" href="/">✖</a>
+                </form>
+            {% else %}
+                <div class="task-main">
+                    <span class="task-text {% if task.completed %}completed{% endif %}">{{ task.text }}</span>
+                    <div class="task-meta">
+                        <span>📁 {{ task.category }}</span>
+                        <span class="priority-{{ task.priority }}">● {{ task.priority }}</span>
+                        {% if task.due_date %}<span>📅 {{ task.due_date }}</span>{% endif %}
+                        {% if task.recurrence and task.recurrence != "none" %}
+                            <span>🔁 {{ task.recurrence|capitalize }}</span>
+                        {% endif %}
+                    </div>
                 </div>
+                <a class="icon-link" href="/?edit={{ task.id }}">✏️</a>
+                <a class="icon-link" href="/delete/{{ task.id }}">🗑️</a>
+            {% endif %}
+        </div>
+
+        {% if task.subtasks %}
+            {% set done_count = task.subtasks|selectattr("completed")|list|length %}
+            <p class="subtask-progress">{{ done_count }}/{{ task.subtasks|length }} subtasks done</p>
+            <div class="subtask-list">
+                {% for sub in task.subtasks %}
+                <div class="subtask-row {{ 'done' if sub.completed }}">
+                    <input type="checkbox" onclick="window.location.href='/subtask/complete/{{ sub.id }}/{{ task.id }}'" {% if sub.completed %}checked{% endif %}>
+                    <span>{{ sub.text }}</span>
+                    <a class="icon-link" href="/subtask/delete/{{ sub.id }}/{{ task.id }}">✖</a>
+                </div>
+                {% endfor %}
             </div>
-            <a class="icon-link" href="/?edit={{ task.id }}">✏️</a>
-            <a class="icon-link" href="/delete/{{ task.id }}">🗑️</a>
         {% endif %}
+
+        <form class="subtask-add-form" method="POST" action="/subtask/add/{{ task.id }}">
+            <input type="text" name="subtask_text" placeholder="Add a subtask...">
+            <button type="submit">+ Add</button>
+        </form>
     </div>
     {% else %}
     <p class="empty-state">
