@@ -12,7 +12,7 @@ def get_connection():
 
 
 def init_db():
-    """Create the users and tasks tables if they don't already exist."""
+    """Create the users, tasks, and subtasks tables if they don't already exist."""
     conn = get_connection()
     conn.execute("""
         CREATE TABLE IF NOT EXISTS users (
@@ -34,17 +34,31 @@ def init_db():
             FOREIGN KEY (user_id) REFERENCES users (id)
         )
     """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS subtasks (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            task_id INTEGER NOT NULL,
+            text TEXT NOT NULL,
+            completed INTEGER DEFAULT 0,
+            FOREIGN KEY (task_id) REFERENCES tasks (id)
+        )
+    """)
     conn.commit()
     conn.close()
 
 
-# ---------- Task queries (used by app.py) ----------
+# ---------- Task queries ----------
 
 def get_tasks_for_user(user_id):
     conn = get_connection()
     rows = conn.execute("SELECT * FROM tasks WHERE user_id = ?", (user_id,)).fetchall()
+    tasks = [dict(row) for row in rows]
     conn.close()
-    return [dict(row) for row in rows]
+
+    for task in tasks:
+        task["subtasks"] = get_subtasks_for_task(task["id"])
+
+    return tasks
 
 
 def get_task_by_id(user_id, task_id):
@@ -66,12 +80,14 @@ def task_exists(user_id, text):
 
 def insert_task(user_id, text, category, priority, due_date, recurrence="none"):
     conn = get_connection()
-    conn.execute(
+    cursor = conn.execute(
         "INSERT INTO tasks (user_id, text, category, priority, due_date, recurrence) VALUES (?, ?, ?, ?, ?, ?)",
         (user_id, text, category, priority, due_date, recurrence)
     )
     conn.commit()
+    new_id = cursor.lastrowid
     conn.close()
+    return new_id
 
 
 def toggle_task_complete(user_id, task_id):
@@ -86,6 +102,7 @@ def toggle_task_complete(user_id, task_id):
 
 def delete_task_by_id(user_id, task_id):
     conn = get_connection()
+    conn.execute("DELETE FROM subtasks WHERE task_id = ?", (task_id,))
     conn.execute("DELETE FROM tasks WHERE id = ? AND user_id = ?", (task_id, user_id))
     conn.commit()
     conn.close()
@@ -103,6 +120,11 @@ def update_task(user_id, task_id, text, category, priority, due_date):
 
 def delete_completed_tasks(user_id):
     conn = get_connection()
+    completed_ids = conn.execute(
+        "SELECT id FROM tasks WHERE user_id = ? AND completed = 1", (user_id,)
+    ).fetchall()
+    for row in completed_ids:
+        conn.execute("DELETE FROM subtasks WHERE task_id = ?", (row["id"],))
     conn.execute("DELETE FROM tasks WHERE user_id = ? AND completed = 1", (user_id,))
     conn.commit()
     conn.close()
@@ -126,6 +148,39 @@ def calculate_next_due_date(current_due_date, recurrence):
         return current_due_date
 
     return next_date.strftime("%Y-%m-%d")
+
+
+# ---------- Subtask queries ----------
+
+def get_subtasks_for_task(task_id):
+    conn = get_connection()
+    rows = conn.execute("SELECT * FROM subtasks WHERE task_id = ?", (task_id,)).fetchall()
+    conn.close()
+    return [dict(row) for row in rows]
+
+
+def add_subtask(task_id, text):
+    conn = get_connection()
+    conn.execute("INSERT INTO subtasks (task_id, text) VALUES (?, ?)", (task_id, text))
+    conn.commit()
+    conn.close()
+
+
+def toggle_subtask_complete(subtask_id):
+    conn = get_connection()
+    row = conn.execute("SELECT completed FROM subtasks WHERE id = ?", (subtask_id,)).fetchone()
+    if row:
+        new_status = 0 if row["completed"] else 1
+        conn.execute("UPDATE subtasks SET completed = ? WHERE id = ?", (new_status, subtask_id))
+        conn.commit()
+    conn.close()
+
+
+def delete_subtask(subtask_id):
+    conn = get_connection()
+    conn.execute("DELETE FROM subtasks WHERE id = ?", (subtask_id,))
+    conn.commit()
+    conn.close()
 
 
 # ---------- User queries ----------
