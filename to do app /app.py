@@ -180,5 +180,32 @@ def clear_completed():
     return redirect("/")
 
 
+# ---------- Subtasks ----------
+
+@app.route("/subtask/add/<int:task_id>", methods=["POST"])
+def add_subtask(task_id):
+    text = request.form.get("subtask_text", "").strip()
+    task = db.get_task_by_id(session["user_id"], task_id)
+    if task and text:
+        db.add_subtask(task_id, text)
+    return redirect("/")
+
+
+@app.route("/subtask/complete/<int:subtask_id>/<int:task_id>")
+def complete_subtask(subtask_id, task_id):
+    task = db.get_task_by_id(session["user_id"], task_id)
+    if task:
+        db.toggle_subtask_complete(subtask_id)
+    return redirect("/")
+
+
+@app.route("/subtask/delete/<int:subtask_id>/<int:task_id>")
+def remove_subtask(subtask_id, task_id):
+    task = db.get_task_by_id(session["user_id"], task_id)
+    if task:
+        db.delete_subtask(subtask_id)
+    return redirect("/")
+
+
 if __name__ == "__main__":
     app.run(debug=True)
