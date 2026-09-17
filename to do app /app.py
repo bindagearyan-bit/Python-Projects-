@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request, redirect, session
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
+import calendar
 import database as db
 
 app = Flask(__name__)
@@ -152,13 +154,13 @@ def complete_task(task_id):
         )
 
     db.toggle_task_complete(session["user_id"], task_id)
-    return redirect("/")
+    return redirect(request.referrer or "/")
 
 
 @app.route("/delete/<int:task_id>")
 def delete_task(task_id):
     db.delete_task_by_id(session["user_id"], task_id)
-    return redirect("/")
+    return redirect(request.referrer or "/")
 
 
 @app.route("/edit/<int:task_id>", methods=["POST"])
@@ -188,7 +190,7 @@ def add_subtask(task_id):
     task = db.get_task_by_id(session["user_id"], task_id)
     if task and text:
         db.add_subtask(task_id, text)
-    return redirect("/")
+    return redirect(request.referrer or "/")
 
 
 @app.route("/subtask/complete/<int:subtask_id>/<int:task_id>")
@@ -196,7 +198,7 @@ def complete_subtask(subtask_id, task_id):
     task = db.get_task_by_id(session["user_id"], task_id)
     if task:
         db.toggle_subtask_complete(subtask_id)
-    return redirect("/")
+    return redirect(request.referrer or "/")
 
 
 @app.route("/subtask/delete/<int:subtask_id>/<int:task_id>")
@@ -204,7 +206,57 @@ def remove_subtask(subtask_id, task_id):
     task = db.get_task_by_id(session["user_id"], task_id)
     if task:
         db.delete_subtask(subtask_id)
-    return redirect("/")
+    return redirect(request.referrer or "/")
+
+
+# ---------- Calendar View ----------
+
+@app.route("/calendar")
+def calendar_view():
+    if not require_login():
+        return redirect("/login")
+
+    year = request.args.get("year", type=int, default=datetime.now().year)
+    month = request.args.get("month", type=int, default=datetime.now().month)
+
+    all_tasks = db.get_tasks_for_user(session["user_id"])
+
+    tasks_by_day = {}
+    for task in all_tasks:
+        if task["due_date"]:
+            tasks_by_day.setdefault(task["due_date"], []).append(task)
+
+    cal = calendar.Calendar(firstweekday=6)  # Sunday first
+    month_days = cal.monthdayscalendar(year, month)
+    month_name = calendar.month_name[month]
+
+    prev_month = month - 1
+    prev_year = year
+    if prev_month == 0:
+        prev_month = 12
+        prev_year -= 1
+
+    next_month = month + 1
+    next_year = year
+    if next_month == 13:
+        next_month = 1
+        next_year += 1
+
+    return render_template(
+        "calendar.html",
+        month_days=month_days,
+        month_name=month_name,
+        year=year,
+        month=month,
+        tasks_by_day=tasks_by_day,
+        prev_month=prev_month,
+        prev_year=prev_year,
+        next_month=next_month,
+        next_year=next_year,
+        today=datetime.now().strftime("%Y-%m-%d"),
+        username=session.get("username"),
+        theme=session.get("theme", "light")
+    )
 
 
 if __name__ == "__main__":
