@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Calendar - To-Do List</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; transition: background 0.2s ease, color 0.2s ease; }
+        body.dark { background: #1C1B1F; color: #F5E9D3; }
+
+        .top-bar { text-align: right; font-size: 13px; margin-bottom: 10px; }
+        .top-bar a { color: inherit; }
+
+        h1 { text-align: center; margin-bottom: 4px; }
+
+        .nav-links { text-align: center; margin-bottom: 16px; font-size: 14px; }
+        .nav-links a { margin: 0 10px; text-decoration: none; color: inherit; }
+
+        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+        .cal-header a { text-decoration: none; font-size: 20px; color: inherit; padding: 4px 10px; }
+        .cal-header h2 { margin: 0; font-size: 20px; }
+
+        table { width: 100%; border-collapse: collapse; }
+        th { padding: 8px; font-size: 12px; color: #888; text-transform: uppercase; }
+        body.dark th { color: #aaa; }
+
+        td {
+            border: 1px solid #ddd; height: 90px; vertical-align: top;
+            padding: 4px; width: 14.28%; font-size: 12px;
+        }
+        body.dark td { border-color: #444; }
+
+        .day-num { font-weight: 600; font-size: 12px; margin-bottom: 4px; }
+        .today-cell { background: rgba(37, 117, 252, 0.08); }
+        body.dark .today-cell { background: rgba(245, 233, 211, 0.06); }
+
+        .task-chip {
+            display: block; font-size: 10px; padding: 2px 4px; margin-bottom: 2px;
+            border-radius: 3px; background: #f4f4f4; color: #333; text-decoration: none;
+            overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+        }
+        body.dark .task-chip { background: #2A2830; color: #F5E9D3; }
+        .task-chip.done { text-decoration: line-through; opacity: 0.6; }
+        .chip-High { border-left: 3px solid #C1272D; }
+        .chip-Medium { border-left: 3px solid #C9A227; }
+        .chip-Low { border-left: 3px solid #2f7a3d; }
+
+        .empty-cell { background: transparent; }
+    </style>
+</head>
+<body class="{{ theme }}">
+    <p class="top-bar">
+        <a href="/toggle_theme">{{ '🌙 Dark Mode' if theme == 'light' else '☀️ Light Mode' }}</a>
+        &nbsp;|&nbsp; Logged in as <b>{{ username }}</b> — <a href="/logout">Logout</a>
+    </p>
+
+    <h1>📅 Calendar</h1>
+    <p class="nav-links"><a href="/">← Back to List View</a></p>
+
+    <div class="cal-header">
+        <a href="/calendar?year={{ prev_year }}&month={{ prev_month }}">‹</a>
+        <h2>{{ month_name }} {{ year }}</h2>
+        <a href="/calendar?year={{ next_year }}&month={{ next_month }}">›</a>
+    </div>
+
+    <table>
+        <tr>
+            <th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th>
+        </tr>
+        {% for week in month_days %}
+        <tr>
+            {% for day in week %}
+                {% if day == 0 %}
+                    <td class="empty-cell"></td>
+                {% else %}
+                    {% set date_str = "%04d-%02d-%02d" % (year, month, day) %}
+                    <td class="{{ 'today-cell' if date_str == today }}">
+                        <div class="day-num">{{ day }}</div>
+                        {% if date_str in tasks_by_day %}
+                            {% for task in tasks_by_day[date_str] %}
+                                <a class="task-chip chip-{{ task.priority }} {{ 'done' if task.completed }}" href="/?edit={{ task.id }}" title="{{ task.text }}">
+                                    {{ task.text }}
+                                </a>
+                            {% endfor %}
+                        {% endif %}
+                    </td>
+                {% endif %}
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
