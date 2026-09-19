@@ -1,0 +1,30 @@
+    {% if overdue_tasks or due_today_tasks %}
+    <div class="reminder-banner">
+        {% if overdue_tasks %}
+            <p class="reminder-line overdue">⚠️ {{ overdue_tasks|length }} overdue: 
+                {% for t in overdue_tasks %}{{ t.text }}{% if not loop.last %}, {% endif %}{% endfor %}
+            </p>
+        {% endif %}
+        {% if due_today_tasks %}
+            <p class="reminder-line due-today">🔔 {{ due_today_tasks|length }} due today: 
+                {% for t in due_today_tasks %}{{ t.text }}{% if not loop.last %}, {% endif %}{% endfor %}
+            </p>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <script>
+        // Ask for browser notification permission once, then notify about due-today tasks
+        if ("Notification" in window) {
+            if (Notification.permission === "default") {
+                Notification.requestPermission();
+            }
+            const dueToday = {{ due_today_tasks|map(attribute='text')|list|tojson }};
+            if (Notification.permission === "granted" && dueToday.length > 0 && !sessionStorage.getItem("notified_today")) {
+                new Notification("To-Do Reminder", {
+                    body: dueToday.length + " task(s) due today: " + dueToday.join(", ")
+                });
+                sessionStorage.setItem("notified_today", "1");
+            }
+        }
+    </script>
