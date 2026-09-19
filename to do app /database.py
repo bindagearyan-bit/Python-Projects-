@@ -150,6 +150,23 @@ def calculate_next_due_date(current_due_date, recurrence):
     return next_date.strftime("%Y-%m-%d")
 
 
+def get_due_and_overdue_tasks(user_id):
+    """Return (overdue_tasks, due_today_tasks) for incomplete tasks with due dates."""
+    today_str = datetime.now().strftime("%Y-%m-%d")
+    conn = get_connection()
+    rows = conn.execute(
+        "SELECT * FROM tasks WHERE user_id = ? AND completed = 0 AND due_date != ''",
+        (user_id,)
+    ).fetchall()
+    conn.close()
+
+    tasks = [dict(row) for row in rows]
+    overdue = [t for t in tasks if t["due_date"] < today_str]
+    due_today = [t for t in tasks if t["due_date"] == today_str]
+
+    return overdue, due_today
+
+
 # ---------- Subtask queries ----------
 
 def get_subtasks_for_task(task_id):
