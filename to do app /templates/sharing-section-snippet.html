@@ -1,0 +1,23 @@
+    {% if not is_own_list %}
+        <div class="shared-notice">
+            👥 Viewing <b>{{ shared_owner_name }}'s</b> shared list — <a href="/">Back to my list</a>
+        </div>
+    {% endif %}
+
+    {% if is_own_list %}
+    <div class="share-panel">
+        <form method="POST" action="/share" class="share-form">
+            <input type="text" name="friend_username" placeholder="Friend's username" required>
+            <button type="submit">Share My List</button>
+        </form>
+
+        {% if shared_with_me %}
+            <p class="share-label">Lists shared with me:</p>
+            <div class="share-chips">
+                {% for shared in shared_with_me %}
+                    <a class="share-chip" href="/shared/{{ shared.owner_id }}">{{ shared.username }}</a>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    {% endif %}
