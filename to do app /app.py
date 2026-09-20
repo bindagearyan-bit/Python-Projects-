@@ -13,7 +13,6 @@ PRIORITY_ORDER = {"High": 0, "Medium": 1, "Low": 2}
 
 
 def require_login():
-    """Return True if a user is logged in, else False."""
     return "user_id" in session
 
 
@@ -92,6 +91,9 @@ def home():
     completed_count = len([t for t in all_tasks if t["completed"]])
     progress_pct = int((completed_count / all_tasks_count) * 100) if all_tasks_count > 0 else 0
 
+    overdue_tasks, due_today_tasks = db.get_due_and_overdue_tasks(session["user_id"])
+    shared_with_me = db.get_lists_shared_with_me(session["user_id"])
+
     return render_template(
         "index.html",
         tasks=tasks,
@@ -103,12 +105,16 @@ def home():
         completed_count=completed_count,
         progress_pct=progress_pct,
         username=session.get("username"),
-        theme=session.get("theme", "light")
+        theme=session.get("theme", "light"),
+        overdue_tasks=overdue_tasks,
+        due_today_tasks=due_today_tasks,
+        shared_with_me=shared_with_me,
+        viewing_owner_id=session["user_id"],
+        is_own_list=True
     )
 
 
 def filter_and_sort_tasks(tasks, filter_by, sort_by, search_query):
-    """Apply status filter, text search, and sort order to a task list."""
     if filter_by == "active":
         tasks = [t for t in tasks if not t["completed"]]
     elif filter_by == "completed":
@@ -135,25 +141,36 @@ def add_task():
     priority = request.form.get("priority", "Medium")
     due_date = request.form.get("due_date", "")
     recurrence = request.form.get("recurrence", "none")
+    owner_id = request.form.get("owner_id", type=int) or session["user_id"]
 
-    if task_text and not db.task_exists(session["user_id"], task_text):
-        db.insert_task(session["user_id"], task_text, category, priority, due_date, recurrence)
+    if not db.has_access_to_list(session["user_id"], owner_id):
+        return redirect("/")
 
+    if task_text and not db.task_exists(owner_id, task_text):
+        db.insert_task(owner_id, task_text, category, priority, due_date, recurrence)
+
+    if owner_id != session["user_id"]:
+        return redirect(f"/shared/{owner_id}")
     return redirect("/")
 
 
 @app.route("/complete/<int:task_id>")
 def complete_task(task_id):
-    task = db.get_task_by_id(session["user_id"], task_id)
+    task = db.get_task_by_id_any_owner(task_id)
+    if not task or not db.has_access_to_list(session["user_id"], task["user_id"]):
+        return redirect("/")
 
-    if task and not task["completed"] and task.get("recurrence", "none") != "none":
+    if not task["completed"] and task.get("recurrence", "none") != "none":
         next_due = db.calculate_next_due_date(task["due_date"], task["recurrence"])
         db.insert_task(
-            session["user_id"], task["text"], task["category"],
+            task["user_id"], task["text"], task["category"],
             task["priority"], next_due, task["recurrence"]
         )
 
-    db.toggle_task_complete(session["user_id"], task_id)
+    db.toggle_task_complete_any_owner(task_id)
+
+    if task["user_id"] != session["user_id"]:
+        return redirect(f"/shared/{task['user_id']}")
     return redirect(request.referrer or "/")
 
 
@@ -187,24 +204,24 @@ def clear_completed():
 @app.route("/subtask/add/<int:task_id>", methods=["POST"])
 def add_subtask(task_id):
     text = request.form.get("subtask_text", "").strip()
-    task = db.get_task_by_id(session["user_id"], task_id)
-    if task and text:
+    task = db.get_task_by_id_any_owner(task_id)
+    if task and text and db.has_access_to_list(session["user_id"], task["user_id"]):
         db.add_subtask(task_id, text)
     return redirect(request.referrer or "/")
 
 
 @app.route("/subtask/complete/<int:subtask_id>/<int:task_id>")
 def complete_subtask(subtask_id, task_id):
-    task = db.get_task_by_id(session["user_id"], task_id)
-    if task:
+    task = db.get_task_by_id_any_owner(task_id)
+    if task and db.has_access_to_list(session["user_id"], task["user_id"]):
         db.toggle_subtask_complete(subtask_id)
     return redirect(request.referrer or "/")
 
 
 @app.route("/subtask/delete/<int:subtask_id>/<int:task_id>")
 def remove_subtask(subtask_id, task_id):
-    task = db.get_task_by_id(session["user_id"], task_id)
-    if task:
+    task = db.get_task_by_id_any_owner(task_id)
+    if task and db.has_access_to_list(session["user_id"], task["user_id"]):
         db.delete_subtask(subtask_id)
     return redirect(request.referrer or "/")
 
@@ -226,7 +243,7 @@ def calendar_view():
         if task["due_date"]:
             tasks_by_day.setdefault(task["due_date"], []).append(task)
 
-    cal = calendar.Calendar(firstweekday=6)  # Sunday first
+    cal = calendar.Calendar(firstweekday=6)
     month_days = cal.monthdayscalendar(year, month)
     month_name = calendar.month_name[month]
 
@@ -256,6 +273,63 @@ def calendar_view():
         today=datetime.now().strftime("%Y-%m-%d"),
         username=session.get("username"),
         theme=session.get("theme", "light")
+    )
+
+
+# ---------- Sharing ----------
+
+@app.route("/share", methods=["POST"])
+def share_list():
+    friend_username = request.form.get("friend_username", "").strip()
+    result = db.share_list_with(session["user_id"], friend_username)
+    # result is one of: ok, not_found, self, already_shared — could be flashed via query param
+    return redirect(f"/?share_result={result}")
+
+
+@app.route("/unshare/<int:collaborator_id>")
+def unshare_list(collaborator_id):
+    db.remove_share(session["user_id"], collaborator_id)
+    return redirect("/")
+
+
+@app.route("/shared/<int:owner_id>")
+def view_shared_list(owner_id):
+    if not require_login():
+        return redirect("/login")
+
+    if not db.has_access_to_list(session["user_id"], owner_id):
+        return redirect("/")
+
+    owner = db.get_user_by_id(owner_id)
+    filter_by = request.args.get("filter", "all")
+    sort_by = request.args.get("sort", "none")
+    search_query = request.args.get("q", "").strip().lower()
+
+    all_tasks = db.get_tasks_for_user(owner_id)
+    tasks = filter_and_sort_tasks(all_tasks, filter_by, sort_by, search_query)
+
+    all_tasks_count = len(all_tasks)
+    completed_count = len([t for t in all_tasks if t["completed"]])
+    progress_pct = int((completed_count / all_tasks_count) * 100) if all_tasks_count > 0 else 0
+
+    return render_template(
+        "index.html",
+        tasks=tasks,
+        edit_id=None,
+        filter_by=filter_by,
+        sort_by=sort_by,
+        search_query=search_query,
+        all_tasks_count=all_tasks_count,
+        completed_count=completed_count,
+        progress_pct=progress_pct,
+        username=session.get("username"),
+        theme=session.get("theme", "light"),
+        overdue_tasks=[],
+        due_today_tasks=[],
+        shared_with_me=db.get_lists_shared_with_me(session["user_id"]),
+        viewing_owner_id=owner_id,
+        is_own_list=False,
+        shared_owner_name=owner["username"] if owner else "Unknown"
     )
 
 
