@@ -2,97 +2,190 @@
 <html>
 <head>
     <title>To-Do List</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; transition: background 0.2s ease, color 0.2s ease; }
-        body.dark { background: #1C1B1F; color: #F5E9D3; }
-        h1 { text-align: center; margin-bottom: 4px; }
-        .counter { text-align: center; color: #666; margin-bottom: 10px; font-size: 14px; }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            max-width: 640px;
+            margin: 40px auto;
+            padding: 0 16px;
+            transition: background 0.2s ease, color 0.2s ease;
+            background: #FBF7EE;
+            color: #2B2823;
+        }
+        body.dark { background: #17181C; color: #E9E5DA; }
+
+        .top-bar { display: flex; justify-content: flex-end; gap: 14px; font-size: 13px; margin-bottom: 14px; }
+        .top-bar a { color: inherit; text-decoration: none; opacity: 0.75; }
+        .top-bar a:hover { opacity: 1; }
+
+        h1 {
+            font-family: 'Caveat', cursive;
+            font-size: 44px;
+            text-align: center;
+            margin: 0 0 2px;
+            color: #E07A3F;
+        }
+        .subtitle { text-align: center; font-size: 13px; color: #8a8375; margin-bottom: 18px; }
+        body.dark .subtitle { color: #9b9689; }
+
+        .counter { text-align: center; font-size: 13px; margin-bottom: 8px; color: #6b6455; }
         body.dark .counter { color: #b5ada0; }
 
-        .progress-wrap { background: #eee; border-radius: 8px; height: 10px; margin-bottom: 20px; overflow: hidden; }
-        body.dark .progress-wrap { background: #333; }
-        .progress-bar { background: #2f7a3d; height: 100%; transition: width 0.3s ease; }
+        .progress-wrap { background: #ECE4D3; border-radius: 8px; height: 8px; margin-bottom: 18px; overflow: hidden; }
+        body.dark .progress-wrap { background: #2A2A30; }
+        .progress-bar { background: #E07A3F; height: 100%; transition: width 0.3s ease; }
 
-        .search-row { display: flex; gap: 8px; margin-bottom: 14px; }
-        .search-row input { flex: 1; padding: 8px; }
+        .shared-notice { background: #FFF3E9; color: #E07A3F; padding: 10px 12px; border-radius: 10px; font-size: 13px; margin-bottom: 14px; }
+        body.dark .shared-notice { background: rgba(224,122,63,0.15); color: #f2a978; }
 
-        .controls { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-        .controls a, .controls select {
-            font-size: 13px; padding: 6px 10px; border-radius: 6px; text-decoration: none;
-            border: 1px solid #ccc; color: #333; background: #f4f4f4;
+        .share-panel { margin-bottom: 20px; padding: 14px; background: #F3EDDF; border-radius: 12px; }
+        body.dark .share-panel { background: #212227; }
+        .share-form { display: flex; gap: 8px; margin-bottom: 8px; }
+        .share-form input { flex: 1; padding: 8px 10px; border-radius: 8px; border: 1px solid #ddd3bd; background: #FBF7EE; }
+        body.dark .share-form input { background: #17181C; border-color: #3a3b41; color: #E9E5DA; }
+        .share-label { font-size: 12px; color: #8a8375; margin: 6px 0 4px; }
+        .share-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+        .share-chip { font-size: 12px; padding: 5px 12px; border-radius: 14px; background: #E07A3F; color: white; text-decoration: none; }
+
+        .reminder-banner { margin-bottom: 14px; }
+        .reminder-line { font-size: 13px; padding: 9px 12px; border-radius: 10px; margin-bottom: 6px; }
+        .reminder-line.overdue { background: #FBE9E7; color: #C1272D; }
+        .reminder-line.due-today { background: #FFF6DD; color: #8a6d00; }
+        body.dark .reminder-line.overdue { background: rgba(193,39,45,0.15); color: #ff8a80; }
+        body.dark .reminder-line.due-today { background: rgba(201,162,39,0.15); color: #ffd54f; }
+
+        .search-row { display: flex; gap: 8px; margin-bottom: 12px; }
+        .search-row input { flex: 1; padding: 9px 12px; border-radius: 10px; border: 1px solid #ddd3bd; background: #fff; }
+        body.dark .search-row input { background: #212227; border-color: #3a3b41; color: #E9E5DA; }
+
+        .controls { display: flex; justify-content: center; gap: 6px; margin-bottom: 18px; flex-wrap: wrap; }
+        .controls a {
+            font-size: 12px; padding: 6px 11px; border-radius: 20px; text-decoration: none;
+            border: 1px solid #ddd3bd; color: #6b6455; background: #fff;
         }
-        body.dark .controls a, body.dark .controls select { background: #2A2830; color: #F5E9D3; border-color: #444; }
-        .controls a.active { background: #2575fc; color: white; border-color: #2575fc; }
-        .controls a.danger { background: #fdecea; color: #C1272D; border-color: #f3c6c2; }
+        body.dark .controls a { background: #212227; color: #b5ada0; border-color: #3a3b41; }
+        .controls a.active { background: #E07A3F; color: white; border-color: #E07A3F; }
+        .controls a.danger { background: #FBE9E7; color: #C1272D; border-color: #f3c6c2; }
 
-        .add-form { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
-        .add-form input[type="text"] { flex: 2; padding: 8px; min-width: 140px; }
-        .add-form select, .add-form input[type="date"] { padding: 8px; }
-        body.dark .add-form input, body.dark .add-form select { background: #2A2830; color: #F5E9D3; border-color: #444; }
-        button { padding: 8px 12px; cursor: pointer; }
+        .add-form { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; background: #fff; padding: 14px; border-radius: 14px; box-shadow: 0 2px 10px rgba(0,0,0,0.04); }
+        body.dark .add-form { background: #212227; }
+        .add-form input[type="text"], .add-form select, .add-form input[type="date"] {
+            padding: 8px 10px; border-radius: 8px; border: 1px solid #ddd3bd; background: #FBF7EE; font-family: inherit;
+        }
+        body.dark .add-form input, body.dark .add-form select { background: #17181C; border-color: #3a3b41; color: #E9E5DA; }
+        .add-form input[type="text"] { flex: 2; min-width: 140px; }
+        .add-btn { padding: 8px 16px; border-radius: 8px; border: none; background: #E07A3F; color: white; font-weight: 600; cursor: pointer; }
+        .add-btn:hover { background: #c9682f; }
 
-        .task-block { border-bottom: 1px solid #ddd; padding: 10px 0; }
-        body.dark .task-block { border-color: #444; }
+        .task-block { background: #fff; border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; box-shadow: 0 1px 6px rgba(0,0,0,0.04); }
+        body.dark .task-block { background: #212227; box-shadow: none; }
+
         .task-row { display: flex; align-items: center; gap: 10px; }
         .task-main { flex: 1; }
-        .task-text { display: block; }
-        .completed { text-decoration: line-through; color: #888; }
-        .task-meta { font-size: 12px; color: #777; margin-top: 2px; display: flex; gap: 8px; flex-wrap: wrap; }
-        body.dark .task-meta { color: #aaa; }
+        .task-text { display: block; font-weight: 500; }
+        .completed { text-decoration: line-through; color: #a89f8e; font-weight: 400; }
+        .task-meta { font-size: 11px; color: #8a8375; margin-top: 3px; display: flex; gap: 8px; flex-wrap: wrap; }
+        body.dark .task-meta { color: #8f8a7e; }
 
         .priority-High { color: #C1272D; font-weight: 600; }
         .priority-Medium { color: #C9A227; font-weight: 600; }
-        .priority-Low { color: #2f7a3d; font-weight: 600; }
+        .priority-Low { color: #3a8a4a; font-weight: 600; }
 
-        .empty-state { text-align: center; color: #999; margin-top: 30px; }
+        input[type="checkbox"] { width: 17px; height: 17px; accent-color: #E07A3F; cursor: pointer; }
+
+        .empty-state { text-align: center; color: #a89f8e; margin-top: 30px; font-size: 14px; }
         .edit-form { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; }
-        .edit-form input, .edit-form select { padding: 4px; }
-        .icon-link { text-decoration: none; cursor: pointer; }
+        .edit-form input, .edit-form select { padding: 5px 8px; border-radius: 6px; border: 1px solid #ddd3bd; }
+        .icon-link { text-decoration: none; cursor: pointer; opacity: 0.6; }
+        .icon-link:hover { opacity: 1; }
 
-        .top-bar { text-align: right; font-size: 13px; margin-bottom: 10px; }
-        .top-bar a { color: inherit; }
-
-        .subtask-list { margin: 8px 0 4px 30px; padding: 0; }
+        .subtask-list { margin: 8px 0 4px 27px; padding: 0; }
         .subtask-row { display: flex; align-items: center; gap: 8px; font-size: 13px; padding: 3px 0; }
-        .subtask-row.done span { text-decoration: line-through; color: #999; }
-        .subtask-add-form { display: flex; gap: 6px; margin: 6px 0 0 30px; }
-        .subtask-add-form input { flex: 1; padding: 4px 6px; font-size: 12px; }
-        .subtask-add-form button { padding: 4px 8px; font-size: 12px; }
-        .subtask-progress { font-size: 11px; color: #888; margin-left: 30px; }
-        body.dark .subtask-progress { color: #999; }
+        .subtask-row.done span { text-decoration: line-through; color: #a89f8e; }
+        .subtask-add-form { display: flex; gap: 6px; margin: 6px 0 0 27px; }
+        .subtask-add-form input { flex: 1; padding: 5px 8px; font-size: 12px; border-radius: 6px; border: 1px solid #ddd3bd; background: #FBF7EE; }
+        body.dark .subtask-add-form input { background: #17181C; border-color: #3a3b41; color: #E9E5DA; }
+        .subtask-add-form button { padding: 5px 10px; font-size: 12px; border-radius: 6px; border: none; background: #ECE4D3; cursor: pointer; }
+        body.dark .subtask-add-form button { background: #2A2A30; color: #E9E5DA; }
+        .subtask-progress { font-size: 11px; color: #a89f8e; margin-left: 27px; }
     </style>
 </head>
 <body class="{{ theme }}">
-    <p class="top-bar">
-        <a href="/toggle_theme">{{ '🌙 Dark Mode' if theme == 'light' else '☀️ Light Mode' }}</a>
-        &nbsp;|&nbsp; Logged in as <b>{{ username }}</b> — <a href="/logout">Logout</a>
-    </p>
-
-    <h1>📝 To-Do List</h1>
-    <p class="counter">
-        {{ completed_count }}/{{ all_tasks_count }} tasks completed ({{ progress_pct }}%)
-    </p>
-    <div class="progress-wrap">
-        <div class="progress-bar" style="width: {{ progress_pct }}%;"></div>
+    <div class="top-bar">
+        <a href="/calendar">📅 Calendar</a>
+        <a href="/toggle_theme">{{ '🌙 Dark' if theme == 'light' else '☀️ Light' }}</a>
+        <a href="/logout">Logout ({{ username }})</a>
     </div>
+
+    <h1>my to-dos</h1>
+    <p class="subtitle">keep it simple, keep it done</p>
+
+    {% if not is_own_list %}
+        <div class="shared-notice">👥 Viewing <b>{{ shared_owner_name }}'s</b> shared list — <a href="/">Back to my list</a></div>
+    {% endif %}
+
+    {% if is_own_list %}
+    <div class="share-panel">
+        <form method="POST" action="/share" class="share-form">
+            <input type="text" name="friend_username" placeholder="Friend's username" required>
+            <button type="submit" class="add-btn">Share My List</button>
+        </form>
+        {% if shared_with_me %}
+            <p class="share-label">Lists shared with me:</p>
+            <div class="share-chips">
+                {% for shared in shared_with_me %}
+                    <a class="share-chip" href="/shared/{{ shared.owner_id }}">{{ shared.username }}</a>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <p class="counter">{{ completed_count }}/{{ all_tasks_count }} completed ({{ progress_pct }}%)</p>
+    <div class="progress-wrap"><div class="progress-bar" style="width: {{ progress_pct }}%;"></div></div>
+
+    {% if overdue_tasks or due_today_tasks %}
+    <div class="reminder-banner">
+        {% if overdue_tasks %}
+            <p class="reminder-line overdue">⚠️ {{ overdue_tasks|length }} overdue: {% for t in overdue_tasks %}{{ t.text }}{% if not loop.last %}, {% endif %}{% endfor %}</p>
+        {% endif %}
+        {% if due_today_tasks %}
+            <p class="reminder-line due-today">🔔 {{ due_today_tasks|length }} due today: {% for t in due_today_tasks %}{{ t.text }}{% if not loop.last %}, {% endif %}{% endfor %}</p>
+        {% endif %}
+    </div>
+    <script>
+        if ("Notification" in window) {
+            if (Notification.permission === "default") { Notification.requestPermission(); }
+            const dueToday = {{ due_today_tasks|map(attribute='text')|list|tojson }};
+            if (Notification.permission === "granted" && dueToday.length > 0 && !sessionStorage.getItem("notified_today")) {
+                new Notification("To-Do Reminder", { body: dueToday.length + " task(s) due today: " + dueToday.join(", ") });
+                sessionStorage.setItem("notified_today", "1");
+            }
+        }
+    </script>
+    {% endif %}
 
     <form class="search-row" method="GET" action="/">
         <input type="hidden" name="filter" value="{{ filter_by }}">
         <input type="hidden" name="sort" value="{{ sort_by }}">
         <input type="text" name="q" placeholder="Search tasks..." value="{{ search_query }}">
-        <button type="submit">Search</button>
+        <button type="submit" class="add-btn">Search</button>
     </form>
 
     <div class="controls">
         <a href="/?filter=all&sort={{ sort_by }}" class="{{ 'active' if filter_by == 'all' }}">All</a>
         <a href="/?filter=active&sort={{ sort_by }}" class="{{ 'active' if filter_by == 'active' }}">Active</a>
         <a href="/?filter=completed&sort={{ sort_by }}" class="{{ 'active' if filter_by == 'completed' }}">Completed</a>
-        <a href="/?filter={{ filter_by }}&sort=priority" class="{{ 'active' if sort_by == 'priority' }}">Sort: Priority</a>
-        <a href="/?filter={{ filter_by }}&sort=due_date" class="{{ 'active' if sort_by == 'due_date' }}">Sort: Due Date</a>
-        <a href="/clear_completed" class="danger">Clear Completed</a>
+        <a href="/?filter={{ filter_by }}&sort=priority" class="{{ 'active' if sort_by == 'priority' }}">Priority</a>
+        <a href="/?filter={{ filter_by }}&sort=due_date" class="{{ 'active' if sort_by == 'due_date' }}">Due Date</a>
+        <a href="/clear_completed" class="danger">Clear Done</a>
     </div>
 
     <form class="add-form" method="POST" action="/add">
+        <input type="hidden" name="owner_id" value="{{ viewing_owner_id }}">
         <input type="text" name="task" placeholder="Add a new task..." required>
         <input type="text" name="category" placeholder="Category">
         <select name="priority">
@@ -103,10 +196,10 @@
         <input type="date" name="due_date">
         <select name="recurrence">
             <option value="none" selected>No repeat</option>
-            <option value="daily">Repeat Daily</option>
-            <option value="weekly">Repeat Weekly</option>
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
         </select>
-        <button type="submit">Add</button>
+        <button type="submit" class="add-btn">Add</button>
     </form>
 
     {% for task in tasks %}
@@ -124,7 +217,7 @@
                         <option value="Low" {% if task.priority == "Low" %}selected{% endif %}>Low</option>
                     </select>
                     <input type="date" name="new_due_date" value="{{ task.due_date }}">
-                    <button type="submit">Save</button>
+                    <button type="submit" class="add-btn">Save</button>
                     <a class="icon-link" href="/">✖</a>
                 </form>
             {% else %}
@@ -134,13 +227,13 @@
                         <span>📁 {{ task.category }}</span>
                         <span class="priority-{{ task.priority }}">● {{ task.priority }}</span>
                         {% if task.due_date %}<span>📅 {{ task.due_date }}</span>{% endif %}
-                        {% if task.recurrence and task.recurrence != "none" %}
-                            <span>🔁 {{ task.recurrence|capitalize }}</span>
-                        {% endif %}
+                        {% if task.recurrence and task.recurrence != "none" %}<span>🔁 {{ task.recurrence|capitalize }}</span>{% endif %}
                     </div>
                 </div>
+                {% if is_own_list %}
                 <a class="icon-link" href="/?edit={{ task.id }}">✏️</a>
                 <a class="icon-link" href="/delete/{{ task.id }}">🗑️</a>
+                {% endif %}
             {% endif %}
         </div>
 
@@ -164,9 +257,7 @@
         </form>
     </div>
     {% else %}
-    <p class="empty-state">
-        {% if search_query %}No tasks match "{{ search_query }}"{% else %}Nothing to do yet — add your first task above 🎉{% endif %}
-    </p>
+    <p class="empty-state">{% if search_query %}No tasks match "{{ search_query }}"{% else %}Nothing to do yet — add your first task above 🎉{% endif %}</p>
     {% endfor %}
 </body>
 </html>
