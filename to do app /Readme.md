@@ -64,6 +64,7 @@ Open `http://127.0.0.1:5000`, sign up for an account, and start adding tasks.
 ## 🤝 Contributing
 
 This is a personal learning project, but suggestions and feedback are always welcome!
+Because guiding someone will help him to get success more early 
 
 ## 📄 License
 
