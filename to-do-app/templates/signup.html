@@ -1,74 +1,64 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Sign Up - To-Do List</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up — TaskView</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        * { box-sizing: border-box; }
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #FBF7EE;
-            min-height: 100vh;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .card {
-            background: #fff;
-            border-radius: 16px;
-            padding: 40px 32px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.06);
-            width: 340px;
-            max-width: 90%;
-            text-align: center;
-        }
-        h1 {
-            font-family: 'Caveat', cursive;
-            font-size: 42px;
-            color: #E07A3F;
-            margin: 0 0 4px;
-        }
-        .subtitle { font-size: 13px; color: #8a8375; margin-bottom: 24px; }
-        input {
-            width: 100%;
-            padding: 11px 12px;
-            border-radius: 10px;
-            border: 1px solid #ddd3bd;
-            background: #FBF7EE;
-            font-family: inherit;
-            font-size: 14px;
-            margin-bottom: 12px;
-        }
-        button {
-            width: 100%;
-            padding: 11px;
-            border: none;
-            border-radius: 10px;
-            background: #E07A3F;
-            color: white;
-            font-weight: 600;
-            font-size: 15px;
-            cursor: pointer;
-        }
-        button:hover { background: #c9682f; }
-        .error { color: #C1272D; font-size: 13px; margin-bottom: 12px; }
-        .switch-link { margin-top: 18px; font-size: 13px; color: #8a8375; }
-        .switch-link a { color: #E07A3F; text-decoration: none; font-weight: 600; }
-    </style>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <div class="card">
-        <h1>my to-dos</h1>
-        <p class="subtitle">create your account</p>
-        {% if error %}<p class="error">{{ error }}</p>{% endif %}
-        <form method="POST">
-            <input type="text" name="username" placeholder="Choose a username" required>
-            <input type="password" name="password" placeholder="Choose a password" required>
-            <button type="submit">Sign Up</button>
-        </form>
-        <p class="switch-link">Already have an account? <a href="/login">Login</a></p>
+
+    <!-- LAYER B: AMBIENT DIAGONAL GEOMETRIC BANDS -->
+    <div class="bg-decorations" aria-hidden="true">
+        <div class="bg-band bg-band-1"></div>
+        <div class="bg-band bg-band-2"></div>
+        <div class="bg-band bg-band-3"></div>
     </div>
+
+    <!-- MAIN FLOATING AUTH CARD -->
+    <main class="auth-container-card">
+        <div class="auth-inner-box">
+            <div class="auth-brand-badge">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                </svg>
+            </div>
+
+            <h1 class="auth-title">Create Account</h1>
+            <p class="auth-subtitle">Join TaskView to track, organize, and get things done</p>
+
+            {% if error %}
+            <div class="auth-error-banner">{{ error }}</div>
+            {% endif %}
+
+            <form class="auth-form" method="POST" action="/signup">
+                <div class="auth-input-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" class="auth-input" placeholder="Choose a username" required autofocus>
+                </div>
+
+                <div class="auth-input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" class="auth-input" placeholder="Create a password" required>
+                </div>
+
+                <button type="submit" class="auth-submit-btn">Create Account</button>
+            </form>
+
+            <div class="auth-switch-text">
+                Already have an account? <a href="/login">Log in</a>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Clear any lingering client-side session state
+        try { sessionStorage.clear(); } catch(e) {}
+    </script>
 </body>
 </html>

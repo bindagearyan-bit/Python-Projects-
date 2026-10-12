@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, session
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime
+from datetime import datetime, timedelta
 import calendar
 import database as db
 
@@ -12,8 +12,82 @@ db.init_db()
 PRIORITY_ORDER = {"High": 0, "Medium": 1, "Low": 2}
 
 
+@app.after_request
+def add_cache_headers(response):
+    """Prevent browser from serving stale cached pages when switching or creating accounts."""
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
+
+
 def require_login():
     return "user_id" in session
+
+
+def get_week_analytics(tasks):
+    """
+    Compute real weekly capsule chart data and schedule strip for the current week (Mon-Fri).
+    Scoped strictly to the user's tasks. If user has 0 tasks, every metric cleanly starts at 0.
+    """
+    today = datetime.now()
+    monday = today - timedelta(days=today.weekday())
+    day_names = ["Mon", "Tue", "Wed", "Thu", "Fri"]
+
+    task_counts_by_date = {}
+    completed_counts_by_date = {}
+    for t in tasks:
+        d = t.get("due_date", "")
+        if d:
+            task_counts_by_date[d] = task_counts_by_date.get(d, 0) + 1
+            if t.get("completed"):
+                completed_counts_by_date[d] = completed_counts_by_date.get(d, 0) + 1
+
+    raw_days = []
+    for i in range(5):
+        day_date = monday + timedelta(days=i)
+        date_str = day_date.strftime("%Y-%m-%d")
+        day_name = day_names[i]
+        day_num = day_date.day
+        count = task_counts_by_date.get(date_str, 0)
+        completed = completed_counts_by_date.get(date_str, 0)
+        is_today = (day_date.date() == today.date())
+        raw_days.append({
+            "name": day_name,
+            "date_str": date_str,
+            "day_num": day_num,
+            "count": count,
+            "completed": completed,
+            "is_today": is_today
+        })
+
+    max_count = max([d["count"] for d in raw_days], default=0)
+
+    weekly_capsules = []
+    schedule_week = []
+    for d in raw_days:
+        if max_count > 0 and d["count"] > 0:
+            height_pct = max(30, int((d["count"] / max_count) * 85))
+        else:
+            height_pct = 0
+
+        weekly_capsules.append({
+            "label": d["name"],
+            "count": d["count"],
+            "height_pct": height_pct,
+            "is_today": d["is_today"],
+            "date_str": d["date_str"]
+        })
+
+        schedule_week.append({
+            "name": d["name"],
+            "num": d["day_num"],
+            "is_today": d["is_today"],
+            "has_tasks": (d["count"] > 0),
+            "dot_color": "var(--accent-purple)" if d["completed"] > 0 else "var(--accent-peach)"
+        })
+
+    return weekly_capsules, schedule_week
 
 
 # ---------- Auth ----------
@@ -32,8 +106,10 @@ def signup():
         else:
             hashed = generate_password_hash(password)
             user = db.create_user(username, hashed)
+            # Clear any existing session to ensure a brand new start from 0
+            session.clear()
             session["user_id"] = user["id"]
-            session["username"] = username
+            session["username"] = user["username"]
             return redirect("/")
 
     return render_template("signup.html", error=error)
@@ -48,6 +124,8 @@ def login():
         user = db.get_user_by_username(username)
 
         if user and check_password_hash(user["password"], password):
+            # Clean session before setting user credentials
+            session.clear()
             session["user_id"] = user["id"]
             session["username"] = user["username"]
             return redirect("/")
@@ -55,6 +133,20 @@ def login():
             error = "Invalid username or password."
 
     return render_template("login.html", error=error)
+
+
+@app.route("/preview_dashboard")
+def preview_dashboard():
+    if require_login():
+        return redirect("/")
+    return redirect("/login")
+
+
+@app.route("/preview_calendar")
+def preview_calendar():
+    if require_login():
+        return redirect("/calendar")
+    return redirect("/login")
 
 
 @app.route("/logout")
@@ -93,6 +185,7 @@ def home():
 
     overdue_tasks, due_today_tasks = db.get_due_and_overdue_tasks(session["user_id"])
     shared_with_me = db.get_lists_shared_with_me(session["user_id"])
+    weekly_capsules, schedule_week = get_week_analytics(all_tasks)
 
     return render_template(
         "index.html",
@@ -110,7 +203,9 @@ def home():
         due_today_tasks=due_today_tasks,
         shared_with_me=shared_with_me,
         viewing_owner_id=session["user_id"],
-        is_own_list=True
+        is_own_list=True,
+        weekly_capsules=weekly_capsules,
+        schedule_week=schedule_week
     )
 
 
@@ -311,6 +406,7 @@ def view_shared_list(owner_id):
     all_tasks_count = len(all_tasks)
     completed_count = len([t for t in all_tasks if t["completed"]])
     progress_pct = int((completed_count / all_tasks_count) * 100) if all_tasks_count > 0 else 0
+    weekly_capsules, schedule_week = get_week_analytics(all_tasks)
 
     return render_template(
         "index.html",
@@ -329,7 +425,9 @@ def view_shared_list(owner_id):
         shared_with_me=db.get_lists_shared_with_me(session["user_id"]),
         viewing_owner_id=owner_id,
         is_own_list=False,
-        shared_owner_name=owner["username"] if owner else "Unknown"
+        shared_owner_name=owner["username"] if owner else "Unknown",
+        weekly_capsules=weekly_capsules,
+        schedule_week=schedule_week
     )
 
 

@@ -1,263 +1,579 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>To-Do List</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskView — Modern To-Do & Productivity</title>
+    <!-- Google Fonts: Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        * { box-sizing: border-box; }
-        body {
-            font-family: 'Inter', sans-serif;
-            max-width: 640px;
-            margin: 40px auto;
-            padding: 0 16px;
-            transition: background 0.2s ease, color 0.2s ease;
-            background: #FBF7EE;
-            color: #2B2823;
-        }
-        body.dark { background: #17181C; color: #E9E5DA; }
-
-        .top-bar { display: flex; justify-content: flex-end; gap: 14px; font-size: 13px; margin-bottom: 14px; }
-        .top-bar a { color: inherit; text-decoration: none; opacity: 0.75; }
-        .top-bar a:hover { opacity: 1; }
-
-        h1 {
-            font-family: 'Caveat', cursive;
-            font-size: 44px;
-            text-align: center;
-            margin: 0 0 2px;
-            color: #E07A3F;
-        }
-        .subtitle { text-align: center; font-size: 13px; color: #8a8375; margin-bottom: 18px; }
-        body.dark .subtitle { color: #9b9689; }
-
-        .counter { text-align: center; font-size: 13px; margin-bottom: 8px; color: #6b6455; }
-        body.dark .counter { color: #b5ada0; }
-
-        .progress-wrap { background: #ECE4D3; border-radius: 8px; height: 8px; margin-bottom: 18px; overflow: hidden; }
-        body.dark .progress-wrap { background: #2A2A30; }
-        .progress-bar { background: #E07A3F; height: 100%; transition: width 0.3s ease; }
-
-        .shared-notice { background: #FFF3E9; color: #E07A3F; padding: 10px 12px; border-radius: 10px; font-size: 13px; margin-bottom: 14px; }
-        body.dark .shared-notice { background: rgba(224,122,63,0.15); color: #f2a978; }
-
-        .share-panel { margin-bottom: 20px; padding: 14px; background: #F3EDDF; border-radius: 12px; }
-        body.dark .share-panel { background: #212227; }
-        .share-form { display: flex; gap: 8px; margin-bottom: 8px; }
-        .share-form input { flex: 1; padding: 8px 10px; border-radius: 8px; border: 1px solid #ddd3bd; background: #FBF7EE; }
-        body.dark .share-form input { background: #17181C; border-color: #3a3b41; color: #E9E5DA; }
-        .share-label { font-size: 12px; color: #8a8375; margin: 6px 0 4px; }
-        .share-chips { display: flex; gap: 6px; flex-wrap: wrap; }
-        .share-chip { font-size: 12px; padding: 5px 12px; border-radius: 14px; background: #E07A3F; color: white; text-decoration: none; }
-
-        .reminder-banner { margin-bottom: 14px; }
-        .reminder-line { font-size: 13px; padding: 9px 12px; border-radius: 10px; margin-bottom: 6px; }
-        .reminder-line.overdue { background: #FBE9E7; color: #C1272D; }
-        .reminder-line.due-today { background: #FFF6DD; color: #8a6d00; }
-        body.dark .reminder-line.overdue { background: rgba(193,39,45,0.15); color: #ff8a80; }
-        body.dark .reminder-line.due-today { background: rgba(201,162,39,0.15); color: #ffd54f; }
-
-        .search-row { display: flex; gap: 8px; margin-bottom: 12px; }
-        .search-row input { flex: 1; padding: 9px 12px; border-radius: 10px; border: 1px solid #ddd3bd; background: #fff; }
-        body.dark .search-row input { background: #212227; border-color: #3a3b41; color: #E9E5DA; }
-
-        .controls { display: flex; justify-content: center; gap: 6px; margin-bottom: 18px; flex-wrap: wrap; }
-        .controls a {
-            font-size: 12px; padding: 6px 11px; border-radius: 20px; text-decoration: none;
-            border: 1px solid #ddd3bd; color: #6b6455; background: #fff;
-        }
-        body.dark .controls a { background: #212227; color: #b5ada0; border-color: #3a3b41; }
-        .controls a.active { background: #E07A3F; color: white; border-color: #E07A3F; }
-        .controls a.danger { background: #FBE9E7; color: #C1272D; border-color: #f3c6c2; }
-
-        .add-form { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; background: #fff; padding: 14px; border-radius: 14px; box-shadow: 0 2px 10px rgba(0,0,0,0.04); }
-        body.dark .add-form { background: #212227; }
-        .add-form input[type="text"], .add-form select, .add-form input[type="date"] {
-            padding: 8px 10px; border-radius: 8px; border: 1px solid #ddd3bd; background: #FBF7EE; font-family: inherit;
-        }
-        body.dark .add-form input, body.dark .add-form select { background: #17181C; border-color: #3a3b41; color: #E9E5DA; }
-        .add-form input[type="text"] { flex: 2; min-width: 140px; }
-        .add-btn { padding: 8px 16px; border-radius: 8px; border: none; background: #E07A3F; color: white; font-weight: 600; cursor: pointer; }
-        .add-btn:hover { background: #c9682f; }
-
-        .task-block { background: #fff; border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; box-shadow: 0 1px 6px rgba(0,0,0,0.04); }
-        body.dark .task-block { background: #212227; box-shadow: none; }
-
-        .task-row { display: flex; align-items: center; gap: 10px; }
-        .task-main { flex: 1; }
-        .task-text { display: block; font-weight: 500; }
-        .completed { text-decoration: line-through; color: #a89f8e; font-weight: 400; }
-        .task-meta { font-size: 11px; color: #8a8375; margin-top: 3px; display: flex; gap: 8px; flex-wrap: wrap; }
-        body.dark .task-meta { color: #8f8a7e; }
-
-        .priority-High { color: #C1272D; font-weight: 600; }
-        .priority-Medium { color: #C9A227; font-weight: 600; }
-        .priority-Low { color: #3a8a4a; font-weight: 600; }
-
-        input[type="checkbox"] { width: 17px; height: 17px; accent-color: #E07A3F; cursor: pointer; }
-
-        .empty-state { text-align: center; color: #a89f8e; margin-top: 30px; font-size: 14px; }
-        .edit-form { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; }
-        .edit-form input, .edit-form select { padding: 5px 8px; border-radius: 6px; border: 1px solid #ddd3bd; }
-        .icon-link { text-decoration: none; cursor: pointer; opacity: 0.6; }
-        .icon-link:hover { opacity: 1; }
-
-        .subtask-list { margin: 8px 0 4px 27px; padding: 0; }
-        .subtask-row { display: flex; align-items: center; gap: 8px; font-size: 13px; padding: 3px 0; }
-        .subtask-row.done span { text-decoration: line-through; color: #a89f8e; }
-        .subtask-add-form { display: flex; gap: 6px; margin: 6px 0 0 27px; }
-        .subtask-add-form input { flex: 1; padding: 5px 8px; font-size: 12px; border-radius: 6px; border: 1px solid #ddd3bd; background: #FBF7EE; }
-        body.dark .subtask-add-form input { background: #17181C; border-color: #3a3b41; color: #E9E5DA; }
-        .subtask-add-form button { padding: 5px 10px; font-size: 12px; border-radius: 6px; border: none; background: #ECE4D3; cursor: pointer; }
-        body.dark .subtask-add-form button { background: #2A2A30; color: #E9E5DA; }
-        .subtask-progress { font-size: 11px; color: #a89f8e; margin-left: 27px; }
-    </style>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Design System CSS -->
+    <link rel="stylesheet" href="/static/style.css">
 </head>
-<body class="{{ theme }}">
-    <div class="top-bar">
-        <a href="/calendar">📅 Calendar</a>
-        <a href="/toggle_theme">{{ '🌙 Dark' if theme == 'light' else '☀️ Light' }}</a>
-        <a href="/logout">Logout ({{ username }})</a>
+<body>
+
+    <!-- LAYER B: AMBIENT DIAGONAL GEOMETRIC BANDS -->
+    <div class="bg-decorations" aria-hidden="true">
+        <div class="bg-band bg-band-1"></div>
+        <div class="bg-band bg-band-2"></div>
+        <div class="bg-band bg-band-3"></div>
     </div>
 
-    <h1>my to-dos</h1>
-    <p class="subtitle">keep it simple, keep it done</p>
+    <!-- MAIN FLOATING INTERFACE CONTAINER -->
+    <main class="app-container">
 
-    {% if not is_own_list %}
-        <div class="shared-notice">👥 Viewing <b>{{ shared_owner_name }}'s</b> shared list — <a href="/">Back to my list</a></div>
-    {% endif %}
+        <!-- TOP DARK HEADER -->
+        <header class="app-header">
+            <!-- Brand -->
+            <a href="/" class="brand-section">
+                <div class="brand-icon-wrap">
+                    <!-- Isometric 3D Cube Icon -->
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                        <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                    </svg>
+                </div>
+                <span class="brand-title">TaskView</span>
+            </a>
 
-    {% if is_own_list %}
-    <div class="share-panel">
-        <form method="POST" action="/share" class="share-form">
-            <input type="text" name="friend_username" placeholder="Friend's username" required>
-            <button type="submit" class="add-btn">Share My List</button>
-        </form>
-        {% if shared_with_me %}
-            <p class="share-label">Lists shared with me:</p>
-            <div class="share-chips">
-                {% for shared in shared_with_me %}
-                    <a class="share-chip" href="/shared/{{ shared.owner_id }}">{{ shared.username }}</a>
-                {% endfor %}
+            <!-- Central Pill Navigation -->
+            <nav class="header-nav-pill" aria-label="Main Navigation">
+                <a href="/" class="nav-pill-btn active">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    Dashboard
+                </a>
+                <a href="/calendar" class="nav-pill-icon-btn" title="Calendar View">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                </a>
+                <a href="/clear_completed" class="nav-pill-icon-btn" title="Clear Completed Tasks" onclick="return confirm('Clear all completed tasks?')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                </a>
+            </nav>
+
+            <!-- User Greeting, Avatar & Notifications -->
+            <div class="header-user-section">
+                <div class="user-text-info">
+                    <div class="user-name">Hello, {{ username }}</div>
+                    <div class="user-status">⚡ {{ progress_pct }}% Completed</div>
+                </div>
+                <div class="user-avatar-wrap" title="{{ username }}">
+                    <span>🧑‍💻</span>
+                </div>
+                <div class="header-action-btn" title="Notifications">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                    {% if overdue_tasks or due_today_tasks %}
+                    <span class="badge-dot"></span>
+                    {% endif %}
+                </div>
+                <a href="/logout" class="header-action-btn" title="Sign Out">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                </a>
             </div>
-        {% endif %}
-    </div>
-    {% endif %}
+        </header>
 
-    <p class="counter">{{ completed_count }}/{{ all_tasks_count }} completed ({{ progress_pct }}%)</p>
-    <div class="progress-wrap"><div class="progress-bar" style="width: {{ progress_pct }}%;"></div></div>
+        <!-- LIGHT CANVAS INTERIOR (3-Zone Asymmetric Layout) -->
+        <div class="app-canvas">
 
-    {% if overdue_tasks or due_today_tasks %}
-    <div class="reminder-banner">
-        {% if overdue_tasks %}
-            <p class="reminder-line overdue">⚠️ {{ overdue_tasks|length }} overdue: {% for t in overdue_tasks %}{{ t.text }}{% if not loop.last %}, {% endif %}{% endfor %}</p>
-        {% endif %}
-        {% if due_today_tasks %}
-            <p class="reminder-line due-today">🔔 {{ due_today_tasks|length }} due today: {% for t in due_today_tasks %}{{ t.text }}{% if not loop.last %}, {% endif %}{% endfor %}</p>
-        {% endif %}
-    </div>
+            <!-- ========================================== -->
+            <!-- ZONE 1: LEFT COLUMN (~31%)                 -->
+            <!-- ========================================== -->
+            <section class="canvas-col">
+
+                <!-- 1. LAVENDER HERO CARD (Card Style A) -->
+                <div class="card card--lavender">
+                    <div>
+                        <div class="card-badge">Daily Momentum</div>
+                        <h2 class="hero-title">Focus on What Matters</h2>
+                        <p class="hero-subtitle">Organize goals, hit milestones, and complete tasks faster.</p>
+                    </div>
+
+                    <!-- Abstract Trophy & Sparkles SVG Illustration -->
+                    <div class="hero-decor-img">
+                        <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="85" cy="40" r="32" fill="rgba(255,255,255,0.14)"/>
+                            <path d="M45 35H95V55C95 68.8071 83.8071 80 70 80C56.1929 80 45 68.8071 45 55V35Z" fill="#F7D45F"/>
+                            <path d="M45 42H33C29.6863 42 27 44.6863 27 48V52C27 58.6274 32.3726 64 39 64H46.5" stroke="#FFE994" stroke-width="4" stroke-linecap="round"/>
+                            <path d="M95 42H107C110.314 42 113 44.6863 113 48V52C113 58.6274 107.627 64 101 64H93.5" stroke="#FFE994" stroke-width="4" stroke-linecap="round"/>
+                            <path d="M70 80V96M56 96H84" stroke="#FFF" stroke-width="5" stroke-linecap="round"/>
+                            <polygon points="70,44 73,52 82,52 75,57 78,65 70,60 62,65 65,57 58,52 67,52" fill="#FFAA72"/>
+                            <!-- Stars & Sparkles -->
+                            <path d="M22 25L24 19L30 17L24 15L22 9L20 15L14 17L20 19Z" fill="#FFE994" opacity="0.9"/>
+                            <path d="M98 22L99 18L103 17L99 16L98 12L97 16L93 17L97 18Z" fill="#FFFFFF" opacity="0.8"/>
+                        </svg>
+                    </div>
+
+                    <a href="#quick-add-section" class="card-action-circle" title="Add a new task">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </a>
+                </div>
+
+                <!-- 2. DUAL STAT COUNTERS (Horizontal) -->
+                <div class="dual-stat-row">
+                    <div class="stat-card-mini">
+                        <div class="stat-icon-badge peach">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                        </div>
+                        <div class="stat-mini-info">
+                            <div class="stat-label">Active Tasks</div>
+                            <div class="stat-value">{{ all_tasks_count - completed_count }}</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card-mini">
+                        <div class="stat-icon-badge purple">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                        </div>
+                        <div class="stat-mini-info">
+                            <div class="stat-label">Completed</div>
+                            <div class="stat-value">{{ completed_count }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. CATEGORY FILTER PILL STRIP -->
+                <div class="category-strip">
+                    <a href="/?filter={{ filter_by }}&sort={{ sort_by }}" class="category-chip {{ 'active' if not search_query }}">
+                        <span>✨</span> All
+                    </a>
+                    <a href="/?filter={{ filter_by }}&sort={{ sort_by }}&q=Work" class="category-chip {{ 'active' if search_query == 'work' }}">
+                        <span>💼</span> Work
+                    </a>
+                    <a href="/?filter={{ filter_by }}&sort={{ sort_by }}&q=Personal" class="category-chip {{ 'active' if search_query == 'personal' }}">
+                        <span>🧘</span> Personal
+                    </a>
+                    <a href="/?filter={{ filter_by }}&sort={{ sort_by }}&q=Design" class="category-chip {{ 'active' if search_query == 'design' }}">
+                        <span>🎨</span> Design
+                    </a>
+                    <a href="/?filter={{ filter_by }}&sort={{ sort_by }}&q=Study" class="category-chip {{ 'active' if search_query == 'study' }}">
+                        <span>📚</span> Study
+                    </a>
+                </div>
+
+                <!-- 4. DARK FEATURE CARD: QUICK ADD TASK (Card Style D) -->
+                <div class="card card--dark" id="quick-add-section">
+                    <!-- Abstract Background Squiggle Vector -->
+                    <svg class="bg-squiggly" viewBox="0 0 100 100" fill="none">
+                        <path d="M10 80 Q 30 10, 60 50 T 90 20" stroke="white" stroke-width="4" stroke-linecap="round" opacity="0.3"/>
+                        <circle cx="85" cy="75" r="18" stroke="white" stroke-width="2" opacity="0.15"/>
+                    </svg>
+
+                    <div class="dark-card-tag">CREATIVE FLOW</div>
+                    <h3 class="dark-card-title">Quick Add Task</h3>
+
+                    <form class="dark-quick-add-form" method="POST" action="/add">
+                        <input type="hidden" name="owner_id" value="{{ viewing_owner_id }}">
+
+                        <div class="dark-input-row">
+                            <input type="text" name="task" class="dark-input" placeholder="What needs to be done?" required autofocus>
+                            <button type="submit" class="dark-add-btn" title="Add task">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    <polyline points="12 5 19 12 12 19"></polyline>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                            <input type="text" name="category" class="dark-input" placeholder="Category (e.g. Work)">
+                            <select name="priority" class="dark-select">
+                                <option value="High">● High Priority</option>
+                                <option value="Medium" selected>● Medium Priority</option>
+                                <option value="Low">● Low Priority</option>
+                            </select>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                            <input type="date" name="due_date" class="dark-input" title="Due Date">
+                            <select name="recurrence" class="dark-select">
+                                <option value="none">No Repeat</option>
+                                <option value="daily">Repeat Daily</option>
+                                <option value="weekly">Repeat Weekly</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- 5. SHARED LISTS & COLLABORATION -->
+                <div class="card--shared">
+                    <div class="shared-header">
+                        <span>👥 Collaboration & Sharing</span>
+                    </div>
+
+                    {% if not is_own_list %}
+                    <div style="font-size: 11px; color: var(--accent-purple-dark); margin-bottom: 8px; font-weight: 600;">
+                        Viewing <b>{{ shared_owner_name }}'s</b> list — <a href="/" style="color: inherit; text-decoration: underline;">Back to mine</a>
+                    </div>
+                    {% endif %}
+
+                    {% if shared_with_me %}
+                    <div class="shared-chips-list">
+                        {% for shared in shared_with_me %}
+                        <a href="/shared/{{ shared.owner_id }}" class="shared-user-chip">
+                            <span>👤</span> {{ shared.username }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    {% if is_own_list %}
+                    <form method="POST" action="/share" class="shared-add-form">
+                        <input type="text" name="friend_username" class="shared-add-input" placeholder="Share with username..." required>
+                        <button type="submit" class="shared-add-btn">Share</button>
+                    </form>
+                    {% endif %}
+                </div>
+
+            </section>
+
+
+            <!-- ========================================== -->
+            <!-- ZONE 2: CENTER COLUMN (~42%)               -->
+            <!-- ========================================== -->
+            <section class="canvas-col">
+
+                <!-- 1. PEACH ANALYTICS CARD (Card Style B) -->
+                <div class="card card--peach">
+                    <!-- Top Row: Icon + Title & Filter Tabs -->
+                    <div class="peach-header-row">
+                        <div class="peach-title-group">
+                            <div class="peach-icon-badge">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="18" y1="20" x2="18" y2="10"></line>
+                                    <line x1="12" y1="20" x2="12" y2="4"></line>
+                                    <line x1="6" y1="20" x2="6" y2="14"></line>
+                                </svg>
+                            </div>
+                            <h2 class="peach-title">Progress</h2>
+                        </div>
+
+                        <!-- Filter Tabs Pill -->
+                        <div class="peach-filter-tabs">
+                            <a href="/?filter=all&sort={{ sort_by }}" class="peach-tab-btn {{ 'active' if filter_by == 'all' }}">All</a>
+                            <a href="/?filter=active&sort={{ sort_by }}" class="peach-tab-btn {{ 'active' if filter_by == 'active' }}">Active</a>
+                            <a href="/?filter=completed&sort={{ sort_by }}" class="peach-tab-btn {{ 'active' if filter_by == 'completed' }}">Done</a>
+                        </div>
+                    </div>
+
+                    <!-- Big Stats Headline -->
+                    <div class="peach-stats-headline">
+                        <div class="peach-stat-item">
+                            <span class="stat-num">{{ all_tasks_count }}</span>
+                            <span class="stat-unit">tasks</span>
+                        </div>
+                        <div class="peach-stat-item">
+                            <span class="stat-num">{{ progress_pct }}%</span>
+                            <span class="stat-unit">completed</span>
+                        </div>
+                    </div>
+
+                    <!-- Wavy Abstract Background Curve SVG -->
+                    <svg class="peach-bg-curve" viewBox="0 0 400 90" fill="none" preserveAspectRatio="none">
+                        <path d="M0 60 C 100 10, 200 90, 300 30 C 350 0, 380 40, 400 20" stroke="rgba(35,36,42,0.12)" stroke-width="12" stroke-linecap="round"/>
+                    </svg>
+
+                    <!-- CAPSULE BAR CHART (Mon-Fri Progress Visualization) -->
+                    <div class="capsule-chart">
+                        {% for col in weekly_capsules %}
+                        <div class="capsule-column">
+                            <div class="capsule-bar-track" title="{{ col.label }}: {{ col.count }} task{% if col.count != 1 %}s{% endif %}">
+                                <div class="capsule-fill {{ 'striped' if (col.is_today and col.count > 0) }}" style="height: {{ col.height_pct }}%;">
+                                    {% if col.count > 0 %}
+                                    <span class="capsule-val-bubble">{{ col.count }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <span class="capsule-label {{ 'active-today' if col.is_today }}">{{ col.label }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- 2. TASKS LIST SECTION (Card Style C - White Surface) -->
+                <div class="tasks-container-card">
+                    <!-- Header with Sort Controls -->
+                    <div class="tasks-header-row">
+                        <h3 class="tasks-title-text">Tasks & To-Dos</h3>
+                        <div class="tasks-sort-pills">
+                            <a href="/?filter={{ filter_by }}&sort=none" class="sort-pill {{ 'active' if sort_by == 'none' }}">Default</a>
+                            <a href="/?filter={{ filter_by }}&sort=priority" class="sort-pill {{ 'active' if sort_by == 'priority' }}">Priority</a>
+                            <a href="/?filter={{ filter_by }}&sort=due_date" class="sort-pill {{ 'active' if sort_by == 'due_date' }}">Due Date</a>
+                        </div>
+                    </div>
+
+                    <!-- Search Input Pill -->
+                    <form class="search-filter-box" method="GET" action="/">
+                        <input type="hidden" name="filter" value="{{ filter_by }}">
+                        <input type="hidden" name="sort" value="{{ sort_by }}">
+                        <div class="search-input-pill">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                            <input type="text" name="q" placeholder="Search tasks by title or category..." value="{{ search_query }}">
+                        </div>
+                    </form>
+
+                    <!-- Tasks List -->
+                    <div class="task-items-list">
+                        {% for task in tasks %}
+                        <div class="task-item-card {{ 'is-completed' if task.completed }}">
+
+                            <!-- Checkbox Toggle -->
+                            <a href="/complete/{{ task.id }}" class="task-checkbox-btn {{ 'checked' if task.completed }}" title="Toggle complete">
+                                {% if task.completed %}
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                {% endif %}
+                            </a>
+
+                            <!-- Task Main Content -->
+                            <div class="task-content-main">
+                                {% if task.id == edit_id %}
+                                <!-- Inline Edit Form -->
+                                <form method="POST" action="/edit/{{ task.id }}" style="display: flex; flex-direction: column; gap: 8px;">
+                                    <input type="text" name="new_text" value="{{ task.text }}" class="subtask-input-sm" style="font-size: 13px; font-weight: 600; padding: 6px 8px;" required autofocus>
+                                    <div style="display: flex; gap: 6px;">
+                                        <input type="text" name="new_category" value="{{ task.category }}" class="subtask-input-sm" placeholder="Category">
+                                        <select name="new_priority" class="subtask-input-sm">
+                                            <option value="High" {% if task.priority == "High" %}selected{% endif %}>High</option>
+                                            <option value="Medium" {% if task.priority == "Medium" %}selected{% endif %}>Medium</option>
+                                            <option value="Low" {% if task.priority == "Low" %}selected{% endif %}>Low</option>
+                                        </select>
+                                        <input type="date" name="new_due_date" value="{{ task.due_date }}" class="subtask-input-sm">
+                                        <button type="submit" class="subtask-btn-sm" style="background: var(--accent-purple);">Save</button>
+                                        <a href="/" class="subtask-btn-sm" style="background: #999; text-decoration: none; display: inline-flex; align-items: center;">Cancel</a>
+                                    </div>
+                                </form>
+                                {% else %}
+                                <div class="task-text-title">{{ task.text }}</div>
+                                <div class="task-tags-row">
+                                    <span class="tag-badge category">📁 {{ task.category }}</span>
+                                    <span class="tag-badge priority-{{ task.priority }}">● {{ task.priority }}</span>
+                                    {% if task.due_date %}
+                                    <span class="tag-badge due">📅 {{ task.due_date }}</span>
+                                    {% endif %}
+                                    {% if task.recurrence and task.recurrence != "none" %}
+                                    <span class="tag-badge recurrence">🔁 {{ task.recurrence|capitalize }}</span>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+
+                                <!-- Subtasks Accordion -->
+                                {% if task.subtasks %}
+                                <div class="subtasks-wrapper">
+                                    {% for sub in task.subtasks %}
+                                    <div class="subtask-item {{ 'done' if sub.completed }}">
+                                        <a href="/subtask/complete/{{ sub.id }}/{{ task.id }}" class="subtask-checkbox {{ 'done' if sub.completed }}">
+                                            {% if sub.completed %}✓{% endif %}
+                                        </a>
+                                        <span style="flex: 1;">{{ sub.text }}</span>
+                                        <a href="/subtask/delete/{{ sub.id }}/{{ task.id }}" style="color: #bbb; text-decoration: none; font-size: 11px;" title="Delete subtask">✕</a>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+
+                                <!-- Add Subtask Inline Form -->
+                                <form method="POST" action="/subtask/add/{{ task.id }}" class="subtask-add-row">
+                                    <input type="text" name="subtask_text" class="subtask-input-sm" placeholder="+ Add a subtask...">
+                                    <button type="submit" class="subtask-btn-sm">+</button>
+                                </form>
+                            </div>
+
+                            <!-- Actions Group (Edit / Delete) -->
+                            {% if is_own_list and task.id != edit_id %}
+                            <div class="task-actions-group">
+                                <a href="/?edit={{ task.id }}" class="task-action-btn" title="Edit task">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                    </svg>
+                                </a>
+                                <a href="/delete/{{ task.id }}" class="task-action-btn delete" title="Delete task" onclick="return confirm('Delete this task?')">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                    </svg>
+                                </a>
+                            </div>
+                            {% endif %}
+
+                        </div>
+                        {% else %}
+                        <!-- Empty State -->
+                        <div class="empty-tasks-card">
+                            <div class="empty-tasks-icon">
+                                <span>🎉</span>
+                            </div>
+                            <div style="font-weight: 700; font-size: 15px; margin-bottom: 4px; color: var(--text-primary);">
+                                {% if search_query %}No tasks found matching "{{ search_query }}"{% else %}All caught up!{% endif %}
+                            </div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">
+                                {% if search_query %}Try adjusting your search filters.{% else %}Enjoy your free time or add a new task to get started.{% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+            </section>
+
+
+            <!-- ========================================== -->
+            <!-- ZONE 3: RIGHT COLUMN (~27%)                -->
+            <!-- ========================================== -->
+            <section class="canvas-col canvas-col-3">
+
+                <!-- 1. TODAY'S SCHEDULE & MINI WEEK CALENDAR -->
+                <div class="card card--schedule">
+                    <div class="schedule-header-row">
+                        <h3 class="schedule-title">Today's Schedule</h3>
+                        <span style="font-size: 16px;">📚</span>
+                    </div>
+
+                    <div class="schedule-subtitle-chip">
+                        <span>⚡</span>
+                        {% if due_today_tasks %}
+                        {{ due_today_tasks|length }} task(s) due today
+                        {% else %}
+                        Schedule is on track
+                        {% endif %}
+                    </div>
+
+                    <!-- Mini Week Strip -->
+                    <div class="week-strip">
+                        {% for day in schedule_week %}
+                        <div class="week-day-pill {{ 'active' if day.is_today }}" title="{{ day.name }} ({{ day.num }}){% if day.has_tasks %} - Tasks scheduled{% endif %}">
+                            <span class="week-day-name">{{ day.name }}</span>
+                            <span class="week-day-num">{{ day.num }}</span>
+                            <span class="week-day-dot" style="{% if not day.has_tasks %}visibility: hidden;{% else %}background: {{ day.dot_color }};{% endif %}"></span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- 2. PROGRESS PERFORMANCE CARD -->
+                <div class="card card--performance">
+                    <div class="perf-header-row">
+                        <h3 class="perf-title">Progress Performance</h3>
+                        <span style="font-size: 13px; color: var(--text-muted);">●●●</span>
+                    </div>
+
+                    <!-- Multi-segment bar -->
+                    {% set active_count = all_tasks_count - completed_count %}
+                    {% set peach_pct = ((active_count / all_tasks_count) * 100)|int if all_tasks_count > 0 else 0 %}
+                    {% set purple_pct = progress_pct if all_tasks_count > 0 else 0 %}
+
+                    <div class="multi-segment-bar">
+                        <div class="seg-peach" style="width: {{ peach_pct }}%;" title="Active Tasks: {{ active_count }}"></div>
+                        <div class="seg-purple" style="width: {{ purple_pct }}%;" title="Completed Tasks: {{ completed_count }}"></div>
+                    </div>
+
+                    <div class="perf-legend-row">
+                        <div class="perf-legend-item">
+                            <span class="legend-dot peach"></span>
+                            <span>Active ({{ active_count }})</span>
+                        </div>
+                        <div class="perf-legend-item">
+                            <span class="legend-dot purple"></span>
+                            <span>Done ({{ completed_count }})</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. STREAK / ROUTINE LAVENDER MINI CARD -->
+                <div class="card card--streak">
+                    <div class="streak-icon-box">
+                        <span>📖</span>
+                    </div>
+                    <div>
+                        <div class="streak-text-title">Daily Routine</div>
+                        <div class="streak-text-sub">Consistency boosts productivity</div>
+                    </div>
+                </div>
+
+                <!-- 4. ALERTS / OVERDUE & DUE TODAY REMINDERS -->
+                {% if overdue_tasks %}
+                <div class="alert-card-banner overdue">
+                    <span>⚠️</span>
+                    <div>
+                        <b>{{ overdue_tasks|length }} Overdue:</b>
+                        {% for t in overdue_tasks %}{{ t.text }}{% if not loop.last %}, {% endif %}{% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if due_today_tasks %}
+                <div class="alert-card-banner due-today">
+                    <span>🔔</span>
+                    <div>
+                        <b>Due Today:</b>
+                        {% for t in due_today_tasks %}{{ t.text }}{% if not loop.last %}, {% endif %}{% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- 5. QUICK ACTIONS BUTTONS -->
+                <div class="quick-actions-row">
+                    <a href="/calendar" class="btn-pill-action neutral">
+                        📅 Calendar View
+                    </a>
+                    <a href="/clear_completed" class="btn-pill-action danger" onclick="return confirm('Clear completed tasks?')">
+                        Clear Done
+                    </a>
+                </div>
+
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Browser Notifications Web API Script -->
     <script>
         if ("Notification" in window) {
-            if (Notification.permission === "default") { Notification.requestPermission(); }
+            if (Notification.permission === "default") {
+                Notification.requestPermission();
+            }
             const dueToday = {{ due_today_tasks|map(attribute='text')|list|tojson }};
             if (Notification.permission === "granted" && dueToday.length > 0 && !sessionStorage.getItem("notified_today")) {
-                new Notification("To-Do Reminder", { body: dueToday.length + " task(s) due today: " + dueToday.join(", ") });
+                new Notification("TaskView Reminder", {
+                    body: dueToday.length + " task(s) due today: " + dueToday.join(", ")
+                });
                 sessionStorage.setItem("notified_today", "1");
             }
         }
     </script>
-    {% endif %}
-
-    <form class="search-row" method="GET" action="/">
-        <input type="hidden" name="filter" value="{{ filter_by }}">
-        <input type="hidden" name="sort" value="{{ sort_by }}">
-        <input type="text" name="q" placeholder="Search tasks..." value="{{ search_query }}">
-        <button type="submit" class="add-btn">Search</button>
-    </form>
-
-    <div class="controls">
-        <a href="/?filter=all&sort={{ sort_by }}" class="{{ 'active' if filter_by == 'all' }}">All</a>
-        <a href="/?filter=active&sort={{ sort_by }}" class="{{ 'active' if filter_by == 'active' }}">Active</a>
-        <a href="/?filter=completed&sort={{ sort_by }}" class="{{ 'active' if filter_by == 'completed' }}">Completed</a>
-        <a href="/?filter={{ filter_by }}&sort=priority" class="{{ 'active' if sort_by == 'priority' }}">Priority</a>
-        <a href="/?filter={{ filter_by }}&sort=due_date" class="{{ 'active' if sort_by == 'due_date' }}">Due Date</a>
-        <a href="/clear_completed" class="danger">Clear Done</a>
-    </div>
-
-    <form class="add-form" method="POST" action="/add">
-        <input type="hidden" name="owner_id" value="{{ viewing_owner_id }}">
-        <input type="text" name="task" placeholder="Add a new task..." required>
-        <input type="text" name="category" placeholder="Category">
-        <select name="priority">
-            <option value="High">High</option>
-            <option value="Medium" selected>Medium</option>
-            <option value="Low">Low</option>
-        </select>
-        <input type="date" name="due_date">
-        <select name="recurrence">
-            <option value="none" selected>No repeat</option>
-            <option value="daily">Daily</option>
-            <option value="weekly">Weekly</option>
-        </select>
-        <button type="submit" class="add-btn">Add</button>
-    </form>
-
-    {% for task in tasks %}
-    <div class="task-block">
-        <div class="task-row">
-            <input type="checkbox" onclick="window.location.href='/complete/{{ task.id }}'" {% if task.completed %}checked{% endif %}>
-
-            {% if task.id == edit_id %}
-                <form class="edit-form" method="POST" action="/edit/{{ task.id }}">
-                    <input type="text" name="new_text" value="{{ task.text }}" required autofocus>
-                    <input type="text" name="new_category" value="{{ task.category }}">
-                    <select name="new_priority">
-                        <option value="High" {% if task.priority == "High" %}selected{% endif %}>High</option>
-                        <option value="Medium" {% if task.priority == "Medium" %}selected{% endif %}>Medium</option>
-                        <option value="Low" {% if task.priority == "Low" %}selected{% endif %}>Low</option>
-                    </select>
-                    <input type="date" name="new_due_date" value="{{ task.due_date }}">
-                    <button type="submit" class="add-btn">Save</button>
-                    <a class="icon-link" href="/">✖</a>
-                </form>
-            {% else %}
-                <div class="task-main">
-                    <span class="task-text {% if task.completed %}completed{% endif %}">{{ task.text }}</span>
-                    <div class="task-meta">
-                        <span>📁 {{ task.category }}</span>
-                        <span class="priority-{{ task.priority }}">● {{ task.priority }}</span>
-                        {% if task.due_date %}<span>📅 {{ task.due_date }}</span>{% endif %}
-                        {% if task.recurrence and task.recurrence != "none" %}<span>🔁 {{ task.recurrence|capitalize }}</span>{% endif %}
-                    </div>
-                </div>
-                {% if is_own_list %}
-                <a class="icon-link" href="/?edit={{ task.id }}">✏️</a>
-                <a class="icon-link" href="/delete/{{ task.id }}">🗑️</a>
-                {% endif %}
-            {% endif %}
-        </div>
-
-        {% if task.subtasks %}
-            {% set done_count = task.subtasks|selectattr("completed")|list|length %}
-            <p class="subtask-progress">{{ done_count }}/{{ task.subtasks|length }} subtasks done</p>
-            <div class="subtask-list">
-                {% for sub in task.subtasks %}
-                <div class="subtask-row {{ 'done' if sub.completed }}">
-                    <input type="checkbox" onclick="window.location.href='/subtask/complete/{{ sub.id }}/{{ task.id }}'" {% if sub.completed %}checked{% endif %}>
-                    <span>{{ sub.text }}</span>
-                    <a class="icon-link" href="/subtask/delete/{{ sub.id }}/{{ task.id }}">✖</a>
-                </div>
-                {% endfor %}
-            </div>
-        {% endif %}
-
-        <form class="subtask-add-form" method="POST" action="/subtask/add/{{ task.id }}">
-            <input type="text" name="subtask_text" placeholder="Add a subtask...">
-            <button type="submit">+ Add</button>
-        </form>
-    </div>
-    {% else %}
-    <p class="empty-state">{% if search_query %}No tasks match "{{ search_query }}"{% else %}Nothing to do yet — add your first task above 🎉{% endif %}</p>
-    {% endfor %}
 </body>
 </html>
